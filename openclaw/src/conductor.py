@@ -171,7 +171,15 @@ class OpenClawConductor:
         
         if result and result['response']:
             data = json.loads(result['response'])
-            return ActionPlan(**data)
+            return ActionPlan(
+            action_id=data.get('action_id', str(uuid.uuid4())),
+            correlation_id=data.get('correlation_id', str(uuid.uuid4())),
+            idempotency_key=data.get('idempotency_key', str(uuid.uuid4())),
+            route_to=data.get('route_to', 'DEVCLAW'),
+            intent=data.get('intent', 'CODE_CHANGE'),
+            payload=data.get('payload', {}),
+            audit=data.get('audit', {})
+        )
         return None
     
     def _log_audit(self, plan: ActionPlan):

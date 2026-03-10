@@ -110,7 +110,7 @@ class SQLiteIdempotencyStore(IdempotencyStore):
     
     def _ensure_table(self):
         """Ensure the idempotency table exists."""
-        from ...shared.db import execute
+        from shared.db import execute
         
         execute("""
             CREATE TABLE IF NOT EXISTS idempotency_keys (
@@ -131,7 +131,7 @@ class SQLiteIdempotencyStore(IdempotencyStore):
     
     def get(self, key: str) -> Optional[IdempotencyRecord]:
         """Get a record by key."""
-        from ...shared.db import execute
+        from shared.db import execute
         
         result = execute(
             "SELECT * FROM idempotency_keys WHERE key = ?",
@@ -159,7 +159,7 @@ class SQLiteIdempotencyStore(IdempotencyStore):
     
     def set(self, record: IdempotencyRecord) -> bool:
         """Store a record."""
-        from ...shared.db import insert
+        from shared.db import insert
         
         try:
             insert("idempotency_keys", {
@@ -177,14 +177,14 @@ class SQLiteIdempotencyStore(IdempotencyStore):
     
     def delete(self, key: str) -> bool:
         """Delete a record."""
-        from ...shared.db import delete
+        from shared.db import delete
         
         rows = delete("idempotency_keys", "key = ?", (key,))
         return rows > 0
     
     def cleanup_expired(self) -> int:
         """Clean up expired records."""
-        from ...shared.db import delete
+        from shared.db import delete
         
         # Delete records where created_at + ttl_seconds < now
         return delete(
@@ -195,7 +195,7 @@ class SQLiteIdempotencyStore(IdempotencyStore):
     
     def clear(self) -> bool:
         """Clear all records."""
-        from ...shared.db import execute
+        from shared.db import execute
         
         try:
             execute("DELETE FROM idempotency_keys")

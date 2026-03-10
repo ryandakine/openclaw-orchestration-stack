@@ -6,6 +6,12 @@ Provides connection pooling, WAL mode, and dictionary-style row access.
 
 import os
 import sqlite3
+
+# Security: Allowed tables/columns for SQL operations
+ALLOWED_TABLES = frozenset({
+    'tasks', 'reviews', 'audit_events', 'idempotency_keys',
+    'dead_letter_tasks', '_migrations'
+})
 import threading
 from contextlib import contextmanager
 from pathlib import Path
