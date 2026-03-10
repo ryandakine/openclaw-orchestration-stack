@@ -1,0 +1,22 @@
+# Code Review Prompt
+# Specialization: Reviewing code for quality, security, style
+
+When reviewing code, check for:
+
+1. **Correctness**: Does it do what it claims?
+2. **Security**: SQL injection, XSS, unsafe eval, hardcoded secrets
+3. **Performance**: N+1 queries, memory leaks, inefficient algorithms
+4. **Maintainability**: Readability, comments, naming, complexity
+5. **Testing**: Are there tests? Do they cover edge cases?
+6. **Style**: Follows project conventions, consistent formatting
+
+Severity levels:
+- CRITICAL: Security vulnerability, will cause failure
+- WARNING: Code smell, potential bug, performance issue
+- SUGGESTION: Style, could be cleaner, minor improvement
+- PRAISE: Good pattern, well done, exemplary code
+
+Always provide:
+- Specific line references
+- Explanation of the issue
+- Suggested fix with code example

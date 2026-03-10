@@ -1,0 +1,71 @@
+{
+  "version": "1.2.1",
+  "cron_schedule": "30 3 * * *",
+  "task": {
+    "id": "pred-market-arb-daily",
+    "title": "Daily Prediction Market Arbitrage Scan",
+    "description": "Scan Polymarket, Kalshi, PredictIt for arbitrage opportunities",
+    "intent": "FILE_TASK",
+    "route_target": "DEVCLAW",
+    "priority": 3,
+    "timeout": 600,
+    "idempotency_key": "arb-scan-{{date}}",
+    "correlation_id": "arb-scan-{{timestamp}}"
+  },
+  "action_plan": {
+    "steps": [
+      {
+        "step": 1,
+        "action": "fetch_polymarket",
+        "agent": "DEVCLAW",
+        "api": "Gamma API",
+        "endpoint": "https://api.gamma.xyz/polymarket/markets",
+        "on_failure": "skip_and_log"
+      },
+      {
+        "step": 2,
+        "action": "fetch_kalshi",
+        "agent": "DEVCLAW",
+        "api": "Kalshi REST",
+        "on_failure": "skip_and_log"
+      },
+      {
+        "step": 3,
+        "action": "fetch_predictit",
+        "agent": "DEVCLAW",
+        "api": "PredictIt",
+        "on_failure": "skip_and_log"
+      },
+      {
+        "step": 4,
+        "action": "fuzzy_match",
+        "agent": "DEVCLAW",
+        "threshold": 0.6
+      },
+      {
+        "step": 5,
+        "action": "calculate_arb",
+        "agent": "DEVCLAW",
+        "min_ev": 2.0,
+        "min_liquidity": 10000
+      },
+      {
+        "step": 6,
+        "action": "telegram_alert",
+        "agent": "N8N",
+        "condition": "opportunities > 0",
+        "max_alerts": 5
+      },
+      {
+        "step": 7,
+        "action": "audit_log",
+        "agent": "DEVCLAW"
+      }
+    ]
+  },
+  "safety": {
+    "read_only": true,
+    "no_auto_trade": true,
+    "alerts_only": true
+  }
+}

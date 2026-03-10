@@ -1,0 +1,24 @@
+[Unit]
+Description=Prediction Market Arbitrage Scanner
+After=network.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/home/ryan/openclaw-orchestration-stack
+Environment=PYTHONPATH=/home/ryan/openclaw-orchestration-stack
+EnvironmentFile=/home/ryan/openclaw-orchestration-stack/.env
+ExecStart=/usr/bin/python3 -m devclaw-runner.src.prediction_markets.arb_scanner
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=pred-market-arb
+
+# Safety
+User=ryan
+Group=ryan
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/home/ryan/openclaw-orchestration-stack/data
+
+[Install]
+WantedBy=multi-user.target

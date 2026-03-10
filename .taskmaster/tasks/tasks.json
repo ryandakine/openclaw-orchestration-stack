@@ -1,1280 +1,1130 @@
 {
-  "tasks": [
-    {
-      "id": "1",
-      "title": "Initialize project structure and repository",
-      "description": "Set up the basic directory structure, initialize git repository, create README and LICENSE",
-      "status": "done",
-      "dependencies": [],
-      "priority": "high",
-      "details": "Create directories: openclaw/, devclaw-runner/, symphony-bridge/, n8n-workflows/, docs/. Initialize with proper documentation.",
-      "testStrategy": "Verify directory structure exists and README is readable",
-      "subtasks": [
-        {
-          "id": 1,
-          "title": "Create root project directory and initialize git",
-          "status": "pending",
-          "details": "mkdir openclaw-orchestration-stack && cd openclaw-orchestration-stack && git init",
-          "parentId": "undefined"
-        },
-        {
-          "id": 2,
-          "title": "Create openclaw/ conductor directory",
-          "status": "pending",
-          "details": "Create src/, config/, prompts/ subdirectories",
-          "parentId": "undefined"
-        },
-        {
-          "id": 3,
-          "title": "Create devclaw-runner/ executor directory",
-          "status": "pending",
-          "details": "Create src/, workers/, templates/ subdirectories",
-          "parentId": "undefined"
-        },
-        {
-          "id": 4,
-          "title": "Create symphony-bridge/ PR manager directory",
-          "status": "pending",
-          "details": "Create src/, github/, review/ subdirectories",
-          "parentId": "undefined"
-        },
-        {
-          "id": 5,
-          "title": "Create n8n-workflows/ directory",
-          "status": "pending",
-          "details": "Create workflows/, credentials/, audit/ subdirectories",
-          "parentId": "undefined"
-        },
-        {
-          "id": 6,
-          "title": "Create shared/ common utilities directory",
-          "status": "pending",
-          "details": "Create models/, schemas/, utils/ subdirectories",
-          "parentId": "undefined"
-        },
-        {
-          "id": 7,
-          "title": "Create docs/ documentation directory",
-          "status": "pending",
-          "details": "Create architecture/, api/, guides/ subdirectories",
-          "parentId": "undefined"
-        },
-        {
-          "id": 8,
-          "title": "Create tests/ test suite directory",
-          "status": "pending",
-          "details": "Create unit/, integration/, e2e/ subdirectories",
-          "parentId": "undefined"
-        },
-        {
-          "id": 9,
-          "title": "Write initial README.md",
-          "status": "pending",
-          "details": "Project overview, architecture diagram, quick start guide",
-          "parentId": "undefined"
-        },
-        {
-          "id": 10,
-          "title": "Create LICENSE file and .gitignore",
-          "status": "pending",
-          "details": "MIT license, Python/Node/Rust gitignore patterns",
-          "parentId": "undefined"
-        }
-      ],
-      "updatedAt": "2026-03-09T23:40:03.703Z"
-    },
-    {
-      "id": "2",
-      "title": "Design SQLite schema for state persistence",
-      "description": "Create database schema for tasks, reviews, audit events, and queue leases",
-      "status": "done",
-      "dependencies": [
-        "1"
-      ],
-      "priority": "high",
-      "details": "Design tables: tasks, reviews, audit_events with proper indexes",
-      "testStrategy": "Run schema creation and verify tables exist",
-      "subtasks": [
-        {
-          "id": 1,
-          "title": "Design tasks table schema",
-          "status": "pending",
-          "details": "id, correlation_id, status, assigned_to, claimed_by, lease_expires_at, retry_count",
-          "parentId": "undefined"
-        },
-        {
-          "id": 2,
-          "title": "Design reviews table schema",
-          "status": "pending",
-          "details": "id, task_id, result, summary, findings, reviewer_id, created_at",
-          "parentId": "undefined"
-        },
-        {
-          "id": 3,
-          "title": "Design audit_events table schema",
-          "status": "pending",
-          "details": "id, correlation_id, timestamp, actor, action, payload",
-          "parentId": "undefined"
-        },
-        {
-          "id": 4,
-          "title": "Create schema.sql file with all DDL",
-          "status": "pending",
-          "details": "Complete SQL schema with foreign keys and constraints",
-          "parentId": "undefined"
-        },
-        {
-          "id": 5,
-          "title": "Create indexes for performance",
-          "status": "pending",
-          "details": "Indexes on status, correlation_id, lease_expires_at",
-          "parentId": "undefined"
-        },
-        {
-          "id": 6,
-          "title": "Implement database connection manager",
-          "status": "pending",
-          "details": "SQLite connection pool with WAL mode",
-          "parentId": "undefined"
-        },
-        {
-          "id": 7,
-          "title": "Create migration system",
-          "status": "pending",
-          "details": "Versioned migrations with up/down scripts",
-          "parentId": "undefined"
-        },
-        {
-          "id": 8,
-          "title": "Write schema validation tests",
-          "status": "pending",
-          "details": "Verify all tables and indexes exist",
-          "parentId": "undefined"
-        },
-        {
-          "id": 9,
-          "title": "Document schema design decisions",
-          "status": "pending",
-          "details": "ER diagram, field descriptions, constraints",
-          "parentId": "undefined"
-        },
-        {
-          "id": 10,
-          "title": "Create seed data for testing",
-          "status": "pending",
-          "details": "Sample tasks, reviews, audit events",
-          "parentId": "undefined"
-        }
-      ],
-      "updatedAt": "2026-03-09T23:46:59.790Z"
-    },
-    {
-      "id": "3",
-      "title": "Implement OpenClaw conductor core",
-      "description": "Build the orchestration brain that receives requests and routes work",
-      "status": "done",
-      "dependencies": [
-        "2"
-      ],
-      "priority": "high",
-      "details": "Create OpenClaw system prompt, ActionPlan schema, routing logic",
-      "testStrategy": "Unit tests for routing decisions",
-      "subtasks": [
-        {
-          "id": 1,
-          "title": "Design ActionPlan data schema",
-          "status": "pending",
-          "details": "action_id, correlation_id, idempotency_key, route_to, intent, payload",
-          "parentId": "undefined"
-        },
-        {
-          "id": 2,
-          "title": "Create OpenClaw system prompt",
-          "status": "pending",
-          "details": "System prompt that minimizes tokens and focuses on routing",
-          "parentId": "undefined"
-        },
-        {
-          "id": 3,
-          "title": "Implement request intake API",
-          "status": "pending",
-          "details": "HTTP endpoint for receiving user/system requests",
-          "parentId": "undefined"
-        },
-        {
-          "id": 4,
-          "title": "Build decision engine router",
-          "status": "pending",
-          "details": "Route to SYMPHONY, DEVCLAW, N8N, MCP based on intent",
-          "parentId": "undefined"
-        },
-        {
-          "id": 5,
-          "title": "Implement ActionPlan emitter",
-          "status": "pending",
-          "details": "Generate structured ActionPlan from requests",
-          "parentId": "undefined"
-        },
-        {
-          "id": 6,
-          "title": "Create intent classification module",
-          "status": "pending",
-          "details": "PR_FIX, CODE_CHANGE, FILE_TASK, DB_READ, NOTIFY, CMS_EDIT",
-          "parentId": "undefined"
-        },
-        {
-          "id": 7,
-          "title": "Build audit trail integration",
-          "status": "pending",
-          "details": "Log all routing decisions to audit_events",
-          "parentId": "undefined"
-        },
-        {
-          "id": 8,
-          "title": "Implement idempotency checking",
-          "status": "pending",
-          "details": "Check idempotency_key before processing",
-          "parentId": "undefined"
-        },
-        {
-          "id": 9,
-          "title": "Create configuration system",
-          "status": "pending",
-          "details": "YAML/JSON config for routing rules",
-          "parentId": "undefined"
-        },
-        {
-          "id": 10,
-          "title": "Write unit tests for routing",
-          "status": "pending",
-          "details": "Test all routing paths and edge cases",
-          "parentId": "undefined"
-        }
-      ],
-      "updatedAt": "2026-03-09T23:47:48.453Z"
-    },
-    {
-      "id": "4",
-      "title": "Build DevClaw runner execution engine",
-      "description": "Create the worker that executes implementation tasks",
-      "status": "pending",
-      "dependencies": [
-        "3"
-      ],
-      "priority": "high",
-      "details": "Implement task polling, lease claiming, repo operations",
-      "testStrategy": "Integration test with sample repo",
-      "subtasks": [
-        {
-          "id": 1,
-          "title": "Implement task queue polling",
-          "status": "pending",
-          "details": "Poll for tasks with status='queued'",
-          "parentId": "undefined"
-        },
-        {
-          "id": 2,
-          "title": "Build atomic task claiming",
-          "status": "pending",
-          "details": "UPDATE with claimed_by, claimed_at, lease_expires_at",
-          "parentId": "undefined"
-        },
-        {
-          "id": 3,
-          "title": "Create git repo checkout module",
-          "status": "pending",
-          "details": "Clone, fetch, checkout to work branch",
-          "parentId": "undefined"
-        },
-        {
-          "id": 4,
-          "title": "Implement code change execution",
-          "status": "pending",
-          "details": "Apply patches, modify files based on task payload",
-          "parentId": "undefined"
-        },
-        {
-          "id": 5,
-          "title": "Build commit and push module",
-          "status": "pending",
-          "details": "Git add, commit with message, push to remote",
-          "parentId": "undefined"
-        },
-        {
-          "id": 6,
-          "title": "Create task completion notifier",
-          "status": "pending",
-          "details": "Send task.completed event to n8n",
-          "parentId": "undefined"
-        },
-        {
-          "id": 7,
-          "title": "Implement retry logic",
-          "status": "pending",
-          "details": "Exponential backoff for failed tasks",
-          "parentId": "undefined"
-        },
-        {
-          "id": 8,
-          "title": "Build safe cleanup on crash",
-          "status": "pending",
-          "details": "Release leases, clean temp files on SIGTERM",
-          "parentId": "undefined"
-        },
-        {
-          "id": 9,
-          "title": "Create worker health check",
-          "status": "pending",
-          "details": "Heartbeat endpoint for monitoring",
-          "parentId": "undefined"
-        },
-        {
-          "id": 10,
-          "title": "Write integration tests",
-          "status": "pending",
-          "details": "Full flow: poll → claim → execute → complete",
-          "parentId": "undefined"
-        }
-      ]
-    },
-    {
-      "id": "5",
-      "title": "Create n8n workflow definitions",
-      "description": "Build n8n workflows for task routing and audit logging",
-      "status": "pending",
-      "dependencies": [
-        "3"
-      ],
-      "priority": "high",
-      "details": "Create workflows: task.create, task.completed, review.report, audit.append",
-      "testStrategy": "Test each workflow trigger",
-      "subtasks": [
-        {
-          "id": 1,
-          "title": "Create task.create workflow",
-          "status": "pending",
-          "details": "Webhook → validate → enqueue → audit → notify",
-          "parentId": "undefined"
-        },
-        {
-          "id": 2,
-          "title": "Create task.completed workflow",
-          "status": "pending",
-          "details": "Receive completion → update state → enqueue review",
-          "parentId": "undefined"
-        },
-        {
-          "id": 3,
-          "title": "Create review.report workflow",
-          "status": "pending",
-          "details": "Process review results → update task → route accordingly",
-          "parentId": "undefined"
-        },
-        {
-          "id": 4,
-          "title": "Create audit.append workflow",
-          "status": "pending",
-          "details": "Append-only audit event logging",
-          "parentId": "undefined"
-        },
-        {
-          "id": 5,
-          "title": "Create notification.send workflow",
-          "status": "pending",
-          "details": "Send alerts to Slack/Discord/email",
-          "parentId": "undefined"
-        },
-        {
-          "id": 6,
-          "title": "Build webhook handler nodes",
-          "status": "pending",
-          "details": "HTTP endpoints for external triggers",
-          "parentId": "undefined"
-        },
-        {
-          "id": 7,
-          "title": "Create database operation nodes",
-          "status": "pending",
-          "details": "SQLite read/write operations",
-          "parentId": "undefined"
-        },
-        {
-          "id": 8,
-          "title": "Implement error handling nodes",
-          "status": "pending",
-          "details": "Catch errors, retry, dead-letter",
-          "parentId": "undefined"
-        },
-        {
-          "id": 9,
-          "title": "Export workflow JSON files",
-          "status": "pending",
-          "details": "Version-controlled n8n workflow exports",
-          "parentId": "undefined"
-        },
-        {
-          "id": 10,
-          "title": "Document workflow triggers",
-          "status": "pending",
-          "details": "Webhook URLs, payload schemas",
-          "parentId": "undefined"
-        }
-      ]
-    },
-    {
-      "id": "6",
-      "title": "Implement Symphony PR bridge",
-      "description": "Build the bridge for Symphony to manage PR lifecycle",
-      "status": "pending",
-      "dependencies": [
-        "5"
-      ],
-      "priority": "high",
-      "details": "PR creation/update, labels, reviews, merge rules",
-      "testStrategy": "Test PR operations",
-      "subtasks": [
-        {
-          "id": 1,
-          "title": "Create GitHub API client",
-          "status": "pending",
-          "details": "REST API wrapper with auth and rate limiting",
-          "parentId": "undefined"
-        },
-        {
-          "id": 2,
-          "title": "Implement PR creation",
-          "status": "pending",
-          "details": "Create PR from branch with title, body, labels",
-          "parentId": "undefined"
-        },
-        {
-          "id": 3,
-          "title": "Build PR update module",
-          "status": "pending",
-          "details": "Update title, body, labels on existing PRs",
-          "parentId": "undefined"
-        },
-        {
-          "id": 4,
-          "title": "Create label management",
-          "status": "pending",
-          "details": "Add/remove labels, create if not exists",
-          "parentId": "undefined"
-        },
-        {
-          "id": 5,
-          "title": "Implement review posting",
-          "status": "pending",
-          "details": "Post review comments, approve/request changes",
-          "parentId": "undefined"
-        },
-        {
-          "id": 6,
-          "title": "Build merge-state checker",
-          "status": "pending",
-          "details": "Check CI status, required reviews, conflicts",
-          "parentId": "undefined"
-        },
-        {
-          "id": 7,
-          "title": "Create status reporting",
-          "status": "pending",
-          "details": "Post PR status updates as comments",
-          "parentId": "undefined"
-        },
-        {
-          "id": 8,
-          "title": "Implement PR linking to issues",
-          "status": "pending",
-          "details": "Link PRs to related issues via keywords",
-          "parentId": "undefined"
-        },
-        {
-          "id": 9,
-          "title": "Build webhook receiver",
-          "status": "pending",
-          "details": "Receive GitHub webhooks for PR events",
-          "parentId": "undefined"
-        },
-        {
-          "id": 10,
-          "title": "Write GitHub mock tests",
-          "status": "pending",
-          "details": "Mock GitHub API for testing",
-          "parentId": "undefined"
-        }
-      ]
-    },
-    {
-      "id": "7",
-      "title": "Build mandatory review queue system",
-      "description": "Implement the review queue that all completed tasks must pass through",
-      "status": "pending",
-      "dependencies": [
-        "4",
-        "6"
-      ],
-      "priority": "high",
-      "details": "Review queue with approve/reject/block outcomes",
-      "testStrategy": "End-to-end review flow test",
-      "subtasks": [
-        {
-          "id": 1,
-          "title": "Design review queue states",
-          "status": "pending",
-          "details": "review_queued, review_failed, remediation_queued, approved",
-          "parentId": "undefined"
-        },
-        {
-          "id": 2,
-          "title": "Implement review task enqueuing",
-          "status": "pending",
-          "details": "Auto-enqueue when DevClaw completes",
-          "parentId": "undefined"
-        },
-        {
-          "id": 3,
-          "title": "Build Symphony reviewer process",
-          "status": "pending",
-          "details": "Claim review task, analyze diff, post findings",
-          "parentId": "undefined"
-        },
-        {
-          "id": 4,
-          "title": "Create review checklist module",
-          "status": "pending",
-          "details": "Correctness, bugs, security, style, tests, scope",
-          "parentId": "undefined"
-        },
-        {
-          "id": 5,
-          "title": "Implement approve outcome",
-          "status": "pending",
-          "details": "work_finish with result=approve, PR ready",
-          "parentId": "undefined"
-        },
-        {
-          "id": 6,
-          "title": "Implement reject outcome",
-          "status": "pending",
-          "details": "work_finish with result=reject, create remediation",
-          "parentId": "undefined"
-        },
-        {
-          "id": 7,
-          "title": "Implement block outcome",
-          "status": "pending",
-          "details": "work_finish with result=blocked, human needed",
-          "parentId": "undefined"
-        },
-        {
-          "id": 8,
-          "title": "Build remediation loop",
-          "status": "pending",
-          "details": "Rejected → remediation_queued → DevClaw → review",
-          "parentId": "undefined"
-        },
-        {
-          "id": 9,
-          "title": "Create review metrics tracking",
-          "status": "pending",
-          "details": "Track pass/fail rates, review time",
-          "parentId": "undefined"
-        },
-        {
-          "id": 10,
-          "title": "Write review flow tests",
-          "status": "pending",
-          "details": "Test all three outcomes end-to-end",
-          "parentId": "undefined"
-        }
-      ]
-    },
-    {
-      "id": "8",
-      "title": "Create .openclaw/review.yaml config system",
-      "description": "Build per-repo configuration for mixed-language support",
-      "status": "pending",
-      "dependencies": [
-        "7"
-      ],
-      "priority": "medium",
-      "details": "Config parser for review.yaml with commands, security, policy",
-      "testStrategy": "Parse sample configs",
-      "subtasks": [
-        {
-          "id": 1,
-          "title": "Design review.yaml schema",
-          "status": "pending",
-          "details": "repo, commands, security, policy sections",
-          "parentId": "undefined"
-        },
-        {
-          "id": 2,
-          "title": "Implement YAML parser",
-          "status": "pending",
-          "details": "Parse and validate review.yaml files",
-          "parentId": "undefined"
-        },
-        {
-          "id": 3,
-          "title": "Create language detection",
-          "status": "pending",
-          "details": "Auto-detect Python, Rust, Node from repo",
-          "parentId": "undefined"
-        },
-        {
-          "id": 4,
-          "title": "Build command execution",
-          "status": "pending",
-          "details": "Run test, lint, typecheck commands",
-          "parentId": "undefined"
-        },
-        {
-          "id": 5,
-          "title": "Implement security scanning",
-          "status": "pending",
-          "details": "dependency_scan, secret_scan commands",
-          "parentId": "undefined"
-        },
-        {
-          "id": 6,
-          "title": "Create policy enforcement",
-          "status": "pending",
-          "details": "allow_warn_merge, fail_on_warn_over",
-          "parentId": "undefined"
-        },
-        {
-          "id": 7,
-          "title": "Build profile system",
-          "status": "pending",
-          "details": "STANDARD, STRICT, LENIENT profiles",
-          "parentId": "undefined"
-        },
-        {
-          "id": 8,
-          "title": "Create config validation",
-          "status": "pending",
-          "details": "Validate commands exist, schema is correct",
-          "parentId": "undefined"
-        },
-        {
-          "id": 9,
-          "title": "Write example configs",
-          "status": "pending",
-          "details": "Python, Rust, Node examples",
-          "parentId": "undefined"
-        },
-        {
-          "id": 10,
-          "title": "Document config options",
-          "status": "pending",
-          "details": "Full reference for all config fields",
-          "parentId": "undefined"
-        }
-      ]
-    },
-    {
-      "id": "9",
-      "title": "Implement queue leasing and idempotency",
-      "description": "Add atomic task claiming and idempotency keys",
-      "status": "pending",
-      "dependencies": [
-        "2",
-        "4"
-      ],
-      "priority": "high",
-      "details": "Lease metadata and idempotency for all operations",
-      "testStrategy": "Test concurrent claiming",
-      "subtasks": [
-        {
-          "id": 1,
-          "title": "Design lease metadata format",
-          "status": "pending",
-          "details": "claimed_by, claimed_at, lease_expires_at",
-          "parentId": "undefined"
-        },
-        {
-          "id": 2,
-          "title": "Implement atomic claim query",
-          "status": "pending",
-          "details": "UPDATE ... WHERE status='queued' AND lease_expires_at < now",
-          "parentId": "undefined"
-        },
-        {
-          "id": 3,
-          "title": "Build lease extension mechanism",
-          "status": "pending",
-          "details": "Workers can extend leases while working",
-          "parentId": "undefined"
-        },
-        {
-          "id": 4,
-          "title": "Create lease expiration handler",
-          "status": "pending",
-          "details": "Reset expired leases to queued",
-          "parentId": "undefined"
-        },
-        {
-          "id": 5,
-          "title": "Implement correlation_id tracking",
-          "status": "pending",
-          "details": "All operations tied to correlation_id",
-          "parentId": "undefined"
-        },
-        {
-          "id": 6,
-          "title": "Build idempotency_key storage",
-          "status": "pending",
-          "details": "Store and check idempotency keys",
-          "parentId": "undefined"
-        },
-        {
-          "id": 7,
-          "title": "Create duplicate detection",
-          "status": "pending",
-          "details": "Return cached result for duplicate requests",
-          "parentId": "undefined"
-        },
-        {
-          "id": 8,
-          "title": "Implement dead-letter queue",
-          "status": "pending",
-          "details": "Max retries exceeded → dead-letter",
-          "parentId": "undefined"
-        },
-        {
-          "id": 9,
-          "title": "Build lease monitoring",
-          "status": "pending",
-          "details": "Alert on stuck leases",
-          "parentId": "undefined"
-        },
-        {
-          "id": 10,
-          "title": "Write concurrency tests",
-          "status": "pending",
-          "details": "Multiple workers racing for same task",
-          "parentId": "undefined"
-        }
-      ]
-    },
-    {
-      "id": "10",
-      "title": "Build observability dashboard",
-      "description": "Create real-time dashboard for monitoring",
-      "status": "pending",
-      "dependencies": [
-        "5",
-        "7"
-      ],
-      "priority": "medium",
-      "details": "Dashboard with queue depth, metrics, alerts",
-      "testStrategy": "Verify metrics display",
-      "subtasks": [
-        {
-          "id": 1,
-          "title": "Design dashboard layout",
-          "status": "pending",
-          "details": "Queue status, task metrics, review stats",
-          "parentId": "undefined"
-        },
-        {
-          "id": 2,
-          "title": "Implement queue depth metric",
-          "status": "pending",
-          "details": "Real-time queued task count by priority",
-          "parentId": "undefined"
-        },
-        {
-          "id": 3,
-          "title": "Build stuck task detection",
-          "status": "pending",
-          "details": "Tasks stuck in executing/review_queued",
-          "parentId": "undefined"
-        },
-        {
-          "id": 4,
-          "title": "Create cycle time tracking",
-          "status": "pending",
-          "details": "Time from queued to approved",
-          "parentId": "undefined"
-        },
-        {
-          "id": 5,
-          "title": "Implement retry rate metric",
-          "status": "pending",
-          "details": "Tasks requiring multiple attempts",
-          "parentId": "undefined"
-        },
-        {
-          "id": 6,
-          "title": "Build review pass/fail rate",
-          "status": "pending",
-          "details": "Percentage of reviews passed",
-          "parentId": "undefined"
-        },
-        {
-          "id": 7,
-          "title": "Create dead-letter monitoring",
-          "status": "pending",
-          "details": "Tasks that failed permanently",
-          "parentId": "undefined"
-        },
-        {
-          "id": 8,
-          "title": "Implement alert system",
-          "status": "pending",
-          "details": "Webhooks for critical thresholds",
-          "parentId": "undefined"
-        },
-        {
-          "id": 9,
-          "title": "Build web UI",
-          "status": "pending",
-          "details": "Simple HTML/JS dashboard",
-          "parentId": "undefined"
-        },
-        {
-          "id": 10,
-          "title": "Create metrics API",
-          "status": "pending",
-          "details": "JSON endpoints for external monitoring",
-          "parentId": "undefined"
-        }
-      ]
-    },
-    {
-      "id": "11",
-      "title": "Python repo pilot implementation",
-      "description": "Test end-to-end flow on one Python repository",
-      "status": "pending",
-      "dependencies": [
-        "8",
-        "9",
-        "10"
-      ],
-      "priority": "high",
-      "details": "Deploy system to a real Python repo",
-      "testStrategy": "Full integration test",
-      "subtasks": [
-        {
-          "id": 1,
-          "title": "Select pilot Python repo",
-          "status": "pending",
-          "details": "Choose repo with existing tests",
-          "parentId": "undefined"
-        },
-        {
-          "id": 2,
-          "title": "Create .openclaw/review.yaml",
-          "status": "pending",
-          "details": "Python-specific commands config",
-          "parentId": "undefined"
-        },
-        {
-          "id": 3,
-          "title": "Deploy OpenClaw conductor",
-          "status": "pending",
-          "details": "Configure and start conductor",
-          "parentId": "undefined"
-        },
-        {
-          "id": 4,
-          "title": "Deploy DevClaw runner",
-          "status": "pending",
-          "details": "Configure and start runner",
-          "parentId": "undefined"
-        },
-        {
-          "id": 5,
-          "title": "Deploy Symphony bridge",
-          "status": "pending",
-          "details": "Configure GitHub integration",
-          "parentId": "undefined"
-        },
-        {
-          "id": 6,
-          "title": "Import n8n workflows",
-          "status": "pending",
-          "details": "Load all workflow definitions",
-          "parentId": "undefined"
-        },
-        {
-          "id": 7,
-          "title": "Run end-to-end test task",
-          "status": "pending",
-          "details": "Create test PR with simple change",
-          "parentId": "undefined"
-        },
-        {
-          "id": 8,
-          "title": "Verify review queue flow",
-          "status": "pending",
-          "details": "Complete → review → approve → merge",
-          "parentId": "undefined"
-        },
-        {
-          "id": 9,
-          "title": "Test audit trail",
-          "status": "pending",
-          "details": "Verify all events logged",
-          "parentId": "undefined"
-        },
-        {
-          "id": 10,
-          "title": "Document pilot findings",
-          "status": "pending",
-          "details": "Issues, improvements, lessons learned",
-          "parentId": "undefined"
-        }
-      ]
-    },
-    {
-      "id": "12",
-      "title": "Rust repo support implementation",
-      "description": "Add Rust-specific commands and validation",
-      "status": "pending",
-      "dependencies": [
-        "11"
-      ],
-      "priority": "medium",
-      "details": "Rust review config and commands",
-      "testStrategy": "Verify Rust commands",
-      "subtasks": [
-        {
-          "id": 1,
-          "title": "Create Rust review.yaml template",
-          "status": "pending",
-          "details": "cargo test, clippy, audit, fmt commands",
-          "parentId": "undefined"
-        },
-        {
-          "id": 2,
-          "title": "Implement cargo test runner",
-          "status": "pending",
-          "details": "Execute and parse cargo test output",
-          "parentId": "undefined"
-        },
-        {
-          "id": 3,
-          "title": "Build cargo clippy integration",
-          "status": "pending",
-          "details": "Run clippy and capture warnings",
-          "parentId": "undefined"
-        },
-        {
-          "id": 4,
-          "title": "Add cargo audit support",
-          "status": "pending",
-          "details": "Security vulnerability scanning",
-          "parentId": "undefined"
-        },
-        {
-          "id": 5,
-          "title": "Implement cargo fmt checking",
-          "status": "pending",
-          "details": "Verify code formatting",
-          "parentId": "undefined"
-        },
-        {
-          "id": 6,
-          "title": "Create Rust language detector",
-          "status": "pending",
-          "details": "Detect Rust from Cargo.toml",
-          "parentId": "undefined"
-        },
-        {
-          "id": 7,
-          "title": "Test with real Rust repo",
-          "status": "pending",
-          "details": "End-to-end on Rust project",
-          "parentId": "undefined"
-        },
-        {
-          "id": 8,
-          "title": "Handle Rust-specific errors",
-          "status": "pending",
-          "details": "Parse rustc error format",
-          "parentId": "undefined"
-        },
-        {
-          "id": 9,
-          "title": "Document Rust setup",
-          "status": "pending",
-          "details": "Required tools, installation",
-          "parentId": "undefined"
-        },
-        {
-          "id": 10,
-          "title": "Write Rust integration tests",
-          "status": "pending",
-          "details": "Test Rust command execution",
-          "parentId": "undefined"
-        }
-      ]
-    },
-    {
-      "id": "13",
-      "title": "Node/TypeScript repo support",
-      "description": "Add Node.js and TypeScript support",
-      "status": "pending",
-      "dependencies": [
-        "11"
-      ],
-      "priority": "medium",
-      "details": "Node/TS review config and commands",
-      "testStrategy": "Verify Node commands",
-      "subtasks": [
-        {
-          "id": 1,
-          "title": "Create Node review.yaml template",
-          "status": "pending",
-          "details": "npm test, lint, typecheck, audit commands",
-          "parentId": "undefined"
-        },
-        {
-          "id": 2,
-          "title": "Implement npm test runner",
-          "status": "pending",
-          "details": "Execute and parse test output",
-          "parentId": "undefined"
-        },
-        {
-          "id": 3,
-          "title": "Build npm lint integration",
-          "status": "pending",
-          "details": "ESLint or other linters",
-          "parentId": "undefined"
-        },
-        {
-          "id": 4,
-          "title": "Add npm typecheck support",
-          "status": "pending",
-          "details": "tsc --noEmit for TypeScript",
-          "parentId": "undefined"
-        },
-        {
-          "id": 5,
-          "title": "Implement npm audit",
-          "status": "pending",
-          "details": "Security vulnerability scanning",
-          "parentId": "undefined"
-        },
-        {
-          "id": 6,
-          "title": "Create Node language detector",
-          "status": "pending",
-          "details": "Detect from package.json",
-          "parentId": "undefined"
-        },
-        {
-          "id": 7,
-          "title": "Test with real Node repo",
-          "status": "pending",
-          "details": "End-to-end on Node/TS project",
-          "parentId": "undefined"
-        },
-        {
-          "id": 8,
-          "title": "Handle Node-specific errors",
-          "status": "pending",
-          "details": "Parse npm/eslint error formats",
-          "parentId": "undefined"
-        },
-        {
-          "id": 9,
-          "title": "Document Node setup",
-          "status": "pending",
-          "details": "Required tools, installation",
-          "parentId": "undefined"
-        },
-        {
-          "id": 10,
-          "title": "Write Node integration tests",
-          "status": "pending",
-          "details": "Test Node command execution",
-          "parentId": "undefined"
-        }
-      ]
-    },
-    {
-      "id": "14",
-      "title": "Mixed monorepo support",
-      "description": "Support repos with multiple languages",
-      "status": "pending",
-      "dependencies": [
-        "12",
-        "13"
-      ],
-      "priority": "medium",
-      "details": "Multi-language detection and execution",
-      "testStrategy": "Test monorepo",
-      "subtasks": [
-        {
-          "id": 1,
-          "title": "Design monorepo structure detection",
-          "status": "pending",
-          "details": "Find packages/ apps/ directories",
-          "parentId": "undefined"
-        },
-        {
-          "id": 2,
-          "title": "Implement per-directory language detection",
-          "status": "pending",
-          "details": "Each dir can have different language",
-          "parentId": "undefined"
-        },
-        {
-          "id": 3,
-          "title": "Build workspace-aware execution",
-          "status": "pending",
-          "details": "Run commands from correct directory",
-          "parentId": "undefined"
-        },
-        {
-          "id": 4,
-          "title": "Create aggregated results",
-          "status": "pending",
-          "details": "Combine results from all directories",
-          "parentId": "undefined"
-        },
-        {
-          "id": 5,
-          "title": "Implement selective testing",
-          "status": "pending",
-          "details": "Only test changed directories",
-          "parentId": "undefined"
-        },
-        {
-          "id": 6,
-          "title": "Handle cross-language dependencies",
-          "status": "pending",
-          "details": "Build order for multi-language",
-          "parentId": "undefined"
-        },
-        {
-          "id": 7,
-          "title": "Create monorepo review.yaml format",
-          "status": "pending",
-          "details": "Multi-directory config",
-          "parentId": "undefined"
-        },
-        {
-          "id": 8,
-          "title": "Test with sample monorepo",
-          "status": "pending",
-          "details": "Rust + Python + Node together",
-          "parentId": "undefined"
-        },
-        {
-          "id": 9,
-          "title": "Optimize monorepo performance",
-          "status": "pending",
-          "details": "Parallel execution where possible",
-          "parentId": "undefined"
-        },
-        {
-          "id": 10,
-          "title": "Document monorepo setup",
-          "status": "pending",
-          "details": "Configuration guide",
-          "parentId": "undefined"
-        }
-      ]
-    },
-    {
-      "id": "15",
-      "title": "Documentation and deployment guide",
-      "description": "Write comprehensive documentation",
-      "status": "pending",
-      "dependencies": [
-        "14"
-      ],
-      "priority": "low",
-      "details": "Setup guide, architecture, troubleshooting",
-      "testStrategy": "Review documentation",
-      "subtasks": [
-        {
-          "id": 1,
-          "title": "Write architecture overview",
-          "status": "pending",
-          "details": "System design, data flow",
-          "parentId": "undefined"
-        },
-        {
-          "id": 2,
-          "title": "Create setup guide",
-          "status": "pending",
-          "details": "Step-by-step installation",
-          "parentId": "undefined"
-        },
-        {
-          "id": 3,
-          "title": "Document API reference",
-          "status": "pending",
-          "details": "All endpoints, payloads",
-          "parentId": "undefined"
-        },
-        {
-          "id": 4,
-          "title": "Create troubleshooting guide",
-          "status": "pending",
-          "details": "Common issues, solutions",
-          "parentId": "undefined"
-        },
-        {
-          "id": 5,
-          "title": "Write configuration reference",
-          "status": "pending",
-          "details": "All config options",
-          "parentId": "undefined"
-        },
-        {
-          "id": 6,
-          "title": "Create deployment examples",
-          "status": "pending",
-          "details": "Docker, systemd, k8s",
-          "parentId": "undefined"
-        },
-        {
-          "id": 7,
-          "title": "Document security best practices",
-          "status": "pending",
-          "details": "Secrets, permissions",
-          "parentId": "undefined"
-        },
-        {
-          "id": 8,
-          "title": "Create contributing guide",
-          "status": "pending",
-          "details": "How to contribute",
-          "parentId": "undefined"
-        },
-        {
-          "id": 9,
-          "title": "Write changelog",
-          "status": "pending",
-          "details": "Version history",
-          "parentId": "undefined"
-        },
-        {
-          "id": 10,
-          "title": "Final documentation review",
-          "status": "pending",
-          "details": "Check completeness, accuracy",
-          "parentId": "undefined"
-        }
+  "master": {
+    "tasks": [
+      {
+        "id": "1",
+        "title": "Scan overlapping events on a schedule.",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify scan overlapping events on a schedule. works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.245334Z"
+      },
+      {
+        "id": "2",
+        "title": "Match equivalent events with high confidence.",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify match equivalent events with high confidence. works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.245349Z"
+      },
+      {
+        "id": "3",
+        "title": "Normalize outcomes into comparable YES/NO or side/opposite-side structures.",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify normalize outcomes into comparable yes/no or side/opposite-side structures. works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.245352Z"
+      },
+      {
+        "id": "4",
+        "title": "Calculate post-fee, post-slippage arbitrage correctly.",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify calculate post-fee, post-slippage arbitrage correctly. works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.245355Z"
+      },
+      {
+        "id": "5",
+        "title": "Send Telegram alerts only for high-confidence, actionable opportunities.",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify send telegram alerts only for high-confidence, actionable opportunities. works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.245358Z"
+      },
+      {
+        "id": "6",
+        "title": "Log all scans, matches, rejects, and alerts for audit and later tuning.",
+        "description": " Non-Goals\n\n Auto-betting\n Browser automation\n In-play/live arbitrage in v1\n Multi-leg hedge construction across more than two venues\n Full portfolio optimization in v1\n\n---",
+        "details": "",
+        "testStrategy": "Verify log all scans, matches, rejects, and alerts for audit and later tuning. works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.245362Z"
+      },
+      {
+        "id": "7",
+        "title": "Primary Goals",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify primary goals works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.245378Z"
+      },
+      {
+        "id": "8",
+        "title": "Non-Goals",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify non-goals works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Auto-betting",
+            "description": "",
+            "status": "pending",
+            "dependencies": [],
+            "parentId": "undefined"
+          }
+        ],
+        "updatedAt": "2026-03-10T01:31:10.245575Z"
+      },
+      {
+        "id": "9",
+        "title": "Prediction Markets",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify prediction markets works as expected",
+        "priority": "high",
+        "status": "completed",
+        "dependencies": [],
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Polymarket (primary)",
+            "description": "",
+            "status": "completed",
+            "dependencies": [],
+            "parentId": "undefined"
+          }
+        ],
+        "updatedAt": "2026-03-10T16:52:01.022037Z"
+      },
+      {
+        "id": "10",
+        "title": "Sportsbooks",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify sportsbooks works as expected",
+        "priority": "high",
+        "status": "completed",
+        "dependencies": [],
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Aggregated sportsbook feed via The Odds API or equivalent source",
+            "description": "",
+            "status": "completed",
+            "dependencies": [],
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "DraftKings",
+            "description": "",
+            "status": "completed",
+            "dependencies": [],
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "FanDuel",
+            "description": "",
+            "status": "completed",
+            "dependencies": [],
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Bet365",
+            "description": "",
+            "status": "completed",
+            "dependencies": [],
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "other supported books only if normalized properly",
+            "description": "",
+            "status": "pending",
+            "dependencies": [],
+            "parentId": "undefined"
+          }
+        ],
+        "updatedAt": "2026-03-10T16:52:01.022037Z"
+      },
+      {
+        "id": "11",
+        "title": "Assumption",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify assumption works as expected",
+        "priority": "high",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.245634Z"
+      },
+      {
+        "id": "12",
+        "title": "6.1 Scheduled Scanning",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify 6.1 scheduled scanning works as expected",
+        "priority": "high",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "cron-driven daily run",
+            "description": "",
+            "status": "pending",
+            "dependencies": [],
+            "parentId": "undefined"
+          }
+        ],
+        "updatedAt": "2026-03-10T01:31:10.245701Z"
+      },
+      {
+        "id": "13",
+        "title": "6.2 Event Ingestion and Normalization",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify 6.2 event ingestion and normalization works as expected",
+        "priority": "high",
+        "status": "completed",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T16:52:01.022037Z"
+      },
+      {
+        "id": "14",
+        "title": "6.3 Event Matching",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify 6.3 event matching works as expected",
+        "priority": "high",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.245728Z"
+      },
+      {
+        "id": "15",
+        "title": "6.4 Outcome Mapping",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify 6.4 outcome mapping works as expected",
+        "priority": "high",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.245748Z"
+      },
+      {
+        "id": "16",
+        "title": "6.5 Arbitrage Calculation",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify 6.5 arbitrage calculation works as expected",
+        "priority": "high",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "market fees",
+            "description": "",
+            "status": "pending",
+            "dependencies": [],
+            "parentId": "undefined"
+          }
+        ],
+        "updatedAt": "2026-03-10T01:31:10.245759Z"
+      },
+      {
+        "id": "17",
+        "title": "7.1 NormalizedMarket",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify 7.1 normalizedmarket works as expected",
+        "priority": "high",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.245807Z"
+      },
+      {
+        "id": "18",
+        "title": "7.2 MatchedOpportunity",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify 7.2 matchedopportunity works as expected",
+        "priority": "high",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.245818Z"
+      },
+      {
+        "id": "19",
+        "title": "7.3 ArbOpportunity",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify 7.3 arbopportunity works as expected",
+        "priority": "high",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.245828Z"
+      },
+      {
+        "id": "20",
+        "title": "8.1 Internal Rule",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify 8.1 internal rule works as expected",
+        "priority": "high",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.245860Z"
+      },
+      {
+        "id": "21",
+        "title": "8.2 Conservative Modeling",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify 8.2 conservative modeling works as expected",
+        "priority": "high",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.245870Z"
+      },
+      {
+        "id": "22",
+        "title": "8.3 Sizing",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify 8.3 sizing works as expected",
+        "priority": "high",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.245877Z"
+      },
+      {
+        "id": "23",
+        "title": "$1,000 size \u2192 ${profit1k}",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify $1,000 size \u2192 ${profit1k} works as expected",
+        "priority": "high",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.245919Z"
+      },
+      {
+        "id": "24",
+        "title": "$10,000 size \u2192 ${profit10k}",
+        "description": "Usable Liquidity:",
+        "details": "",
+        "testStrategy": "Verify $10,000 size \u2192 ${profit10k} works as expected",
+        "priority": "high",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.245924Z"
+      },
+      {
+        "id": "25",
+        "title": "{source}: ${liquidity}",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify {source}: ${liquidity} works as expected",
+        "priority": "high",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.245926Z"
+      },
+      {
+        "id": "26",
+        "title": "{source}: ${liquidity}",
+        "description": "Links:\n[{source}] [{source}]\n\nTimestamp: {timestamp}\n\n\n Alert Rules\n\n one alert per unique arb per run\n dedupe repeat alerts unless edge changes materially\n optional \"resolved / gone stale\" follow-up ",
+        "details": "",
+        "testStrategy": "Verify {source}: ${liquidity} works as expected",
+        "priority": "high",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.245930Z"
+      },
+      {
+        "id": "27",
+        "title": "Alert Rules",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify alert rules works as expected",
+        "priority": "high",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "one alert per unique arb per run",
+            "description": "",
+            "status": "pending",
+            "dependencies": [],
+            "parentId": "undefined"
+          }
+        ],
+        "updatedAt": "2026-03-10T01:31:10.245937Z"
+      },
+      {
+        "id": "28",
+        "title": "arbhunter.py",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify arbhunter.py works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.245959Z"
+      },
+      {
+        "id": "29",
+        "title": "marketnormalizer.py",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify marketnormalizer.py works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.245962Z"
+      },
+      {
+        "id": "30",
+        "title": "eventmatcher.py",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify eventmatcher.py works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.245964Z"
+      },
+      {
+        "id": "31",
+        "title": "arbmath.py",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify arbmath.py works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.245965Z"
+      },
+      {
+        "id": "32",
+        "title": "telegramformatter.py",
+        "description": " Modified Files",
+        "details": "",
+        "testStrategy": "Verify telegramformatter.py works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.245968Z"
+      },
+      {
+        "id": "33",
+        "title": "n8n workflow definitions",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify n8n workflow definitions works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.245969Z"
+      },
+      {
+        "id": "34",
+        "title": ".env.example",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify .env.example works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.245971Z"
+      },
+      {
+        "id": "35",
+        "title": ".openclaw/review.yaml",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify .openclaw/review.yaml works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.245972Z"
+      },
+      {
+        "id": "36",
+        "title": "README.md",
+        "description": "---",
+        "details": "",
+        "testStrategy": "Verify readme.md works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.245974Z"
+      },
+      {
+        "id": "37",
+        "title": "New Files",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify new files works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.245980Z"
+      },
+      {
+        "id": "38",
+        "title": "Modified Files",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify modified files works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.245987Z"
+      },
+      {
+        "id": "39",
+        "title": "arbhunter.py",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify arbhunter.py works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.246017Z"
+      },
+      {
+        "id": "40",
+        "title": "marketnormalizer.py",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify marketnormalizer.py works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "transforms raw API responses into canonical format",
+            "description": "",
+            "status": "pending",
+            "dependencies": [],
+            "parentId": "undefined"
+          }
+        ],
+        "updatedAt": "2026-03-10T01:31:10.246022Z"
+      },
+      {
+        "id": "41",
+        "title": "eventmatcher.py",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify eventmatcher.py works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "fuzzy title matching",
+            "description": "",
+            "status": "pending",
+            "dependencies": [],
+            "parentId": "undefined"
+          }
+        ],
+        "updatedAt": "2026-03-10T01:31:10.246028Z"
+      },
+      {
+        "id": "42",
+        "title": "arbmath.py",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify arbmath.py works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "computes gross and net arb edge",
+            "description": "",
+            "status": "pending",
+            "dependencies": [],
+            "parentId": "undefined"
+          }
+        ],
+        "updatedAt": "2026-03-10T01:31:10.246034Z"
+      },
+      {
+        "id": "43",
+        "title": "telegramformatter.py",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify telegramformatter.py works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "generates readable alert payloads",
+            "description": "",
+            "status": "pending",
+            "dependencies": [],
+            "parentId": "undefined"
+          }
+        ],
+        "updatedAt": "2026-03-10T01:31:10.246043Z"
+      },
+      {
+        "id": "44",
+        "title": "Required Environment Variables",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify required environment variables works as expected",
+        "priority": "high",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "ARB_HUNTER_ENABLED=true|false",
+            "description": "",
+            "status": "pending",
+            "dependencies": [],
+            "parentId": "undefined"
+          }
+        ],
+        "updatedAt": "2026-03-10T01:31:10.246062Z"
+      },
+      {
+        "id": "45",
+        "title": "Configurable Thresholds",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify configurable thresholds works as expected",
+        "priority": "high",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "ARB_MIN_NET_EDGE_PCT=2.0",
+            "description": "",
+            "status": "pending",
+            "dependencies": [],
+            "parentId": "undefined"
+          }
+        ],
+        "updatedAt": "2026-03-10T01:31:10.246070Z"
+      },
+      {
+        "id": "46",
+        "title": "Job runs on schedule without crashing",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify job runs on schedule without crashing works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.246119Z"
+      },
+      {
+        "id": "47",
+        "title": "Manual run works",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify manual run works works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.246122Z"
+      },
+      {
+        "id": "48",
+        "title": "Events are normalized into a common format",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify events are normalized into a common format works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.246125Z"
+      },
+      {
+        "id": "49",
+        "title": "Matching logic correctly links at least 3 known overlapping markets in test data",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify matching logic correctly links at least 3 known overlapping markets in test data works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.246127Z"
+      },
+      {
+        "id": "50",
+        "title": "Arb math includes fees, slippage, and liquidity",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify arb math includes fees, slippage, and liquidity works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.246128Z"
+      },
+      {
+        "id": "51",
+        "title": "Only net-positive >2% opportunities alert",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify only net-positive >2% opportunities alert works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.246130Z"
+      },
+      {
+        "id": "52",
+        "title": "Telegram alert format is readable and actionable",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify telegram alert format is readable and actionable works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.246131Z"
+      },
+      {
+        "id": "53",
+        "title": "Every run writes an audit trail",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify every run writes an audit trail works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.246134Z"
+      },
+      {
+        "id": "54",
+        "title": "Scanner can be enabled/disabled via env var",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify scanner can be enabled/disabled via env var works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.246135Z"
+      },
+      {
+        "id": "55",
+        "title": "False-positive suppression works for mismatched resolution rules",
+        "description": "---",
+        "details": "",
+        "testStrategy": "Verify false-positive suppression works for mismatched resolution rules works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.246137Z"
+      },
+      {
+        "id": "56",
+        "title": "Unit Tests",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify unit tests works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "normalize Polymarket market",
+            "description": "",
+            "status": "pending",
+            "dependencies": [],
+            "parentId": "undefined"
+          }
+        ],
+        "updatedAt": "2026-03-10T01:31:10.246166Z"
+      },
+      {
+        "id": "57",
+        "title": "Integration Tests",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify integration tests works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Polymarket + sportsbook fetch pipeline",
+            "description": "",
+            "status": "pending",
+            "dependencies": [],
+            "parentId": "undefined"
+          }
+        ],
+        "updatedAt": "2026-03-10T01:31:10.246177Z"
+      },
+      {
+        "id": "58",
+        "title": "End-to-End Tests",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify end-to-end tests works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "run against 3 known overlapping markets",
+            "description": "",
+            "status": "pending",
+            "dependencies": [],
+            "parentId": "undefined"
+          }
+        ],
+        "updatedAt": "2026-03-10T01:31:10.246185Z"
+      },
+      {
+        "id": "59",
+        "title": "Create arbhunter.py",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify create arbhunter.py works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.246211Z"
+      },
+      {
+        "id": "60",
+        "title": "Create marketnormalizer.py",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify create marketnormalizer.py works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.246213Z"
+      },
+      {
+        "id": "61",
+        "title": "Create eventmatcher.py",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify create eventmatcher.py works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.246215Z"
+      },
+      {
+        "id": "62",
+        "title": "Create arbmath.py",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify create arbmath.py works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.246217Z"
+      },
+      {
+        "id": "63",
+        "title": "Create telegramformatter.py",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify create telegramformatter.py works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.246218Z"
+      },
+      {
+        "id": "64",
+        "title": "Add scheduled cron in n8n",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify add scheduled cron in n8n works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.246219Z"
+      },
+      {
+        "id": "65",
+        "title": "Add manual trigger path",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify add manual trigger path works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.246221Z"
+      },
+      {
+        "id": "66",
+        "title": "Add environment variables to .env.example",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify add environment variables to .env.example works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.246222Z"
+      },
+      {
+        "id": "67",
+        "title": "Add API permissions note to .openclaw/review.yaml",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify add api permissions note to .openclaw/review.yaml works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.246224Z"
+      },
+      {
+        "id": "68",
+        "title": "Write tests for normalization, matching, math, and alerts",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify write tests for normalization, matching, math, and alerts works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.246227Z"
+      },
+      {
+        "id": "69",
+        "title": "Test with 3 real overlapping markets",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify test with 3 real overlapping markets works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.246229Z"
+      },
+      {
+        "id": "70",
+        "title": "Update README",
+        "description": "---",
+        "details": "",
+        "testStrategy": "Verify update readme works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.246231Z"
+      },
+      {
+        "id": "71",
+        "title": "normalization layer",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify normalization layer works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.246252Z"
+      },
+      {
+        "id": "72",
+        "title": "matching layer",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify matching layer works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.246254Z"
+      },
+      {
+        "id": "73",
+        "title": "arb math",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify arb math works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.246255Z"
+      },
+      {
+        "id": "74",
+        "title": "alert formatting",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify alert formatting works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.246256Z"
+      },
+      {
+        "id": "75",
+        "title": "job runner",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify job runner works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.246258Z"
+      },
+      {
+        "id": "76",
+        "title": "cron integration",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify cron integration works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.246260Z"
+      },
+      {
+        "id": "77",
+        "title": "logging/audit",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify logging/audit works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.246262Z"
+      },
+      {
+        "id": "78",
+        "title": "tests",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify tests works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.246264Z"
+      },
+      {
+        "id": "79",
+        "title": "README",
+        "description": "",
+        "details": "",
+        "testStrategy": "Verify readme works as expected",
+        "priority": "medium",
+        "status": "pending",
+        "dependencies": [],
+        "subtasks": [],
+        "updatedAt": "2026-03-10T01:31:10.246265Z"
+      }
+    ],
+    "metadata": {
+      "version": "1.0.0",
+      "lastModified": "2026-03-10T16:52:01.022037Z",
+      "taskCount": 79,
+      "completedCount": 3,
+      "tags": [
+        "master"
       ]
     }
-  ],
-  "metadata": {
-    "version": "1.0.0",
-    "lastModified": "2026-03-09T23:47:48.454Z",
-    "taskCount": 15,
-    "completedCount": 3,
-    "tags": [
-      "master"
-    ]
   }
 }

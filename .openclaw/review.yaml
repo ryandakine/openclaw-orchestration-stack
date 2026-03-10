@@ -1,0 +1,203 @@
+# OpenClaw Code Review Templates
+# Defines review patterns for different languages and project types
+
+templates:
+  # Python Projects
+  python:
+    name: "Python Review"
+    file_patterns: ["*.py"]
+    exclude_patterns: ["__pycache__/*", "*.pyc", ".venv/*", "venv/*"]
+    checks:
+      - type: "syntax"
+        enabled: true
+      - type: "imports"
+        enabled: true
+      - type: "complexity"
+        max_cyclomatic: 10
+        max_function_length: 50
+      - type: "security"
+        enabled: true
+        checks: ["sql-injection", "eval-usage", "pickle-usage"]
+      - type: "style"
+        enabled: true
+        formatter: "black"
+        linter: "flake8"
+    ai_prompt: |
+      Review this Python code for:
+      1. Code quality and maintainability
+      2. Security vulnerabilities
+      3. Performance issues
+      4. PEP 8 compliance
+      5. Type hints usage
+      
+      Provide specific, actionable feedback.
+
+  # Node.js/JavaScript Projects
+  nodejs:
+    name: "Node.js Review"
+    file_patterns: ["*.js", "*.ts", "*.jsx", "*.tsx"]
+    exclude_patterns: ["node_modules/*", "dist/*", "build/*", ".next/*"]
+    checks:
+      - type: "syntax"
+        enabled: true
+      - type: "imports"
+        enabled: true
+      - type: "complexity"
+        max_cyclomatic: 15
+      - type: "security"
+        enabled: true
+        checks: ["eval-usage", "prototype-pollution", "path-traversal"]
+      - type: "dependencies"
+        enabled: true
+        check_vulnerabilities: true
+    ai_prompt: |
+      Review this JavaScript/TypeScript code for:
+      1. Modern ES6+ patterns
+      2. Type safety (if TypeScript)
+      3. Async/await best practices
+      4. Security issues
+      5. Performance optimizations
+      
+      Suggest specific improvements with code examples.
+
+  # Rust Projects
+  rust:
+    name: "Rust Review"
+    file_patterns: ["*.rs"]
+    exclude_patterns: ["target/*", "Cargo.lock"]
+    checks:
+      - type: "syntax"
+        enabled: true
+      - type: "safety"
+        enabled: true
+        check_unsafe: true
+      - type: "performance"
+        enabled: true
+        check_allocations: true
+      - type: "idiomatic"
+        enabled: true
+    ai_prompt: |
+      Review this Rust code for:
+      1. Memory safety and ownership
+      2. Idiomatic Rust patterns
+      3. Performance optimizations
+      4. Error handling
+      5. Unsafe code blocks (if any)
+      
+      Focus on safety and zero-cost abstractions.
+
+  # Mixed Language Projects
+  mixed:
+    name: "Mixed Project Review"
+    file_patterns: ["*"]
+    exclude_patterns: [".git/*", ".github/*", "*.md", "*.txt", "*.json"]
+    checks:
+      - type: "architecture"
+        enabled: true
+      - type: "dependencies"
+        enabled: true
+      - type: "documentation"
+        enabled: true
+    ai_prompt: |
+      Review this mixed-language codebase for:
+      1. Overall architecture and design
+      2. Language-specific best practices
+      3. Integration between components
+      4. Documentation quality
+      5. Testing coverage
+      
+      Provide high-level architectural feedback.
+
+  # Default Template
+  default:
+    name: "General Review"
+    file_patterns: ["*"]
+    exclude_patterns: [".git/*", "*.log", "*.tmp"]
+    checks:
+      - type: "syntax"
+        enabled: true
+      - type: "security"
+        enabled: true
+    ai_prompt: |
+      Review this code for general quality, security, and maintainability.
+
+# Review Rules
+rules:
+  max_file_size: 1000000  # 1MB
+  max_files_per_review: 50
+  ignore_comments: false
+  respect_gitignore: true
+
+# AI Configuration
+ai:
+  model: "claude-3-5-sonnet-20241022"
+  temperature: 0.3
+  max_tokens: 4096
+  
+# Output Settings
+output:
+  format: "markdown"
+  include_suggestions: true
+  include_code_examples: true
+  severity_levels: ["critical", "warning", "suggestion", "praise"]
+
+  # ============================================================================
+  # API-Heavy Cron Tasks
+  # ============================================================================
+  api_heavy_cron:
+    name: "API-Heavy Cron Task"
+    file_patterns: ["*arb_scanner.py", "*prediction_market*"]
+    checks:
+      - type: "security"
+        enabled: true
+        checks: ["no_secrets", "no_hardcoded_keys", "rate_limiting"]
+      - type: "performance"
+        enabled: true
+        check_async: true
+        check_timeouts: true
+        check_retries: true
+      - type: "api_etiquette"
+        enabled: true
+        requirements:
+          - "Must have rate limiting (max 1 req/sec per platform)"
+          - "Must have retry logic with exponential backoff"
+          - "Must have timeout handling (30s default)"
+          - "Must skip on API failure, not crash"
+          - "Must use idempotency keys for all external calls"
+      - type: "safety"
+        enabled: true
+        requirements:
+          - "Read-only operations only"
+          - "No auto-trading or order execution"
+          - "Alerts only - no financial transactions"
+          - "Audit logging required"
+    ai_prompt: |
+      Review this API-heavy cron task for:
+      1. Rate limiting compliance (don't hammer APIs)
+      2. Error resilience (skip on failure, don't crash)
+      3. Idempotency (prevent duplicate alerts)
+      4. Safety (read-only, no auto-trading)
+      5. Audit trail (log everything)
+      6. Timeout handling (don't hang forever)
+      
+      This is for PREDICTION MARKET arbitrage scanning.
+      It should NEVER execute trades - only alert.
+      
+      External APIs:
+      - Polymarket (Gamma API)
+      - Kalshi (REST API)
+      - PredictIt (Public data)
+      - Telegram (Alerts)
+      
+      Check for:
+      - async/await usage
+      - httpx timeouts
+      - try/except blocks
+      - idempotency_key generation
+      - correlation_id tracking
+      - audit logging
+      - EV calculation accuracy
+      - Fee calculation correctness
+      
+      Approve if safe and well-behaved.
+      Reject if it could cause API abuse or financial risk.

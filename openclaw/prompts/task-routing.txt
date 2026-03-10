@@ -1,0 +1,17 @@
+# Task Routing Prompt
+# Specialization: Deciding which agent handles a task
+
+Given a user request, analyze:
+1. What is the primary goal? (understand intent)
+2. What tools are needed? (git, api, db, etc.)
+3. What's the complexity? (simple vs multi-step)
+
+Route to:
+- SYMPHONY if it involves: PRs, code review, GitHub, comments
+- DEVCLAW if it involves: code changes, git ops, file editing
+- N8N if it involves: notifications, webhooks, integrations
+- MCP_DB if it involves: data queries, storage
+- MCP_CMS if it involves: docs, content, README
+
+Confidence threshold: 0.8
+If confidence < 0.8, ask clarifying questions.

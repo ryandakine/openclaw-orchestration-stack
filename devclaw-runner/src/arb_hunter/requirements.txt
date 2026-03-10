@@ -1,0 +1,14 @@
+# OpenClaw Arbitrage Hunter - Python Dependencies
+# Python 3.11+ required
+
+# Async HTTP client
+aiohttp>=3.9.0
+
+# Structured logging
+structlog>=23.0.0
+
+# Async file operations
+aiofiles>=23.0.0
+
+# Type hints (backport for older Python)
+# typing-extensions>=4.8.0  # Only needed for Python < 3.11

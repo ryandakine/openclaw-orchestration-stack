@@ -1,0 +1,156 @@
+{
+  "name": "Prediction Market Arbitrage Scanner",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 24,
+              "triggerAtHour": 3,
+              "triggerAtMinute": 30
+            }
+          ]
+        }
+      },
+      "name": "Cron Trigger (3:30 AM)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://api.gamma.xyz/polymarket/markets?active=true&limit=100",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "name": "Fetch Polymarket",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [450, 100]
+    },
+    {
+      "parameters": {
+        "url": "https://api.elections.kalshi.com/trade-api/v2/markets?status=active&limit=100",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "name": "Fetch Kalshi",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [450, 250]
+    },
+    {
+      "parameters": {
+        "url": "https://www.predictit.org/api/marketdata/all/",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "name": "Fetch PredictIt",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [450, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Fuzzy matching and EV calculation\nconst { SequenceMatcher } = require('difflib');\n\nfunction similarity(a, b) {\n  return new SequenceMatcher(null, a.toLowerCase(), b.toLowerCase()).ratio();\n}\n\nconst opportunities = [];\nconst MIN_EV = 2.0;\nconst MIN_LIQUIDITY = 10000;\n\n// Cross-platform matching logic\nfor (const m1 of $input.all()[0].json.markets) {\n  for (const m2 of $input.all()[1].json.markets) {\n    if (similarity(m1.title, m2.title) > 0.6) {\n      // Calculate arb\n      const fees = { polymarket: 0.0075, kalshi: 0.05, predictit: 0.10 };\n      const cost = m1.yes_price * (1 + fees[m1.platform]) + m2.no_price * (1 + fees[m2.platform]);\n      if (cost < 1.0) {\n        const ev = (1.0 - cost) * 100;\n        if (ev >= MIN_EV && m1.liquidity >= MIN_LIQUIDITY && m2.liquidity >= MIN_LIQUIDITY) {\n          opportunities.push({\n            event: m1.title,\n            platforms: [m1.platform, m2.platform],\n            ev: ev.toFixed(1),\n            profit_1k: ((1.0 - cost) * 1000).toFixed(0)\n          });\n        }\n      }\n    }\n  }\n}\n\nreturn { opportunities: opportunities.slice(0, 5) };"
+      },
+      "name": "Calculate Arbitrage",
+      "type": "n8n-nodes-base.code",
+      "position": [700, 250]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-1",
+              "leftValue": "={{ $json.opportunities.length }}",
+              "rightValue": "0",
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ]
+        }
+      },
+      "name": "Opportunities Found?",
+      "type": "n8n-nodes-base.if",
+      "position": [900, 250]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $env.TELEGRAM_CHAT_ID }}",
+        "text": "={{ '🎯 *Prediction Market Arbitrage*\\n\\n' + $json.opportunities.map(o => `*${o.event.substring(0,60)}*\\n📊 ${o.platforms.join(' vs ')}\\n💰 EV: +${o.ev}% | $${o.profit_1k} on $1k`).join('\\n\\n') }}",
+        "additionalOptions": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "name": "Telegram Alert",
+      "type": "n8n-nodes-base.telegram",
+      "position": [1100, 150]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Log to audit trail\nconst audit = {\n  timestamp: new Date().toISOString(),\n  correlation_id: $execution.id,\n  idempotency_key: $execution.id.slice(0,16),\n  event_type: 'arb_scan_complete',\n  opportunities_found: $input.first().json.opportunities.length\n};\nconsole.log('AUDIT:', JSON.stringify(audit));\nreturn audit;"
+      },
+      "name": "Log Audit",
+      "type": "n8n-nodes-base.code",
+      "position": [1100, 350]
+    }
+  ],
+  "connections": {
+    "Cron Trigger (3:30 AM)": {
+      "main": [
+        [
+          {
+            "node": "Fetch Polymarket",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Kalshi",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch PredictIt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Polymarket": {
+      "main": [[{"node": "Calculate Arbitrage", "type": "main", "index": 0}]]
+    },
+    "Fetch Kalshi": {
+      "main": [[{"node": "Calculate Arbitrage", "type": "main", "index": 0}]]
+    },
+    "Fetch PredictIt": {
+      "main": [[{"node": "Calculate Arbitrage", "type": "main", "index": 0}]]
+    },
+    "Calculate Arbitrage": {
+      "main": [[{"node": "Opportunities Found?", "type": "main", "index": 0}]]
+    },
+    "Opportunities Found?": {
+      "main": [
+        [{"node": "Telegram Alert", "type": "main", "index": 0}],
+        [{"node": "Log Audit", "type": "main", "index": 0}]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "all",
+    "saveDataErrorExecution": "all"
+  },
+  "staticData": null,
+  "tags": ["arbitrage", "prediction-markets", "cron"]
+}

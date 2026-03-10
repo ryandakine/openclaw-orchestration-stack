@@ -1,0 +1,23 @@
+# Default OpenClaw Configuration
+api:
+  host: 0.0.0.0
+  port: 8000
+  workers: 4
+  
+logging:
+  level: INFO
+  format: json
+  
+database:
+  type: sqlite
+  path: /app/data/openclaw.db
+  
+workers:
+  poll_interval: 5
+  max_concurrent: 3
+  lease_duration: 300
+  
+features:
+  enable_audit_log: true
+  enable_metrics: true
+  enable_alerts: true

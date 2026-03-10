@@ -1,0 +1,130 @@
+# OpenClaw Arbitrage Hunter - Docker Container
+# Production-ready container for the prediction market arbitrage scanner
+
+# -----------------------------------------------------------------------------
+# Build stage
+# -----------------------------------------------------------------------------
+FROM python:3.12-slim-bookworm AS builder
+
+# Build arguments
+ARG POETRY_VERSION=1.7.1
+
+# Environment
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Poetry
+RUN pip install "poetry==${POETRY_VERSION}"
+
+# Set working directory
+WORKDIR /build
+
+# Copy dependency files first (for layer caching)
+COPY pyproject.toml poetry.lock* ./
+COPY requirements.txt ./
+
+# Configure Poetry
+RUN poetry config virtualenvs.create false
+
+# Install dependencies
+RUN poetry install --no-interaction --no-ansi --no-root --only main || \
+    pip install -r requirements.txt
+
+# -----------------------------------------------------------------------------
+# Production stage
+# -----------------------------------------------------------------------------
+FROM python:3.12-slim-bookworm AS production
+
+# Labels
+LABEL maintainer="OpenClaw Team <team@openclaw.io>" \
+      description="Prediction Market Arbitrage Scanner" \
+      version="1.2.1"
+
+# Environment
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONFAULTHANDLER=1 \
+    PYTHONHASHSEED=random \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    APP_HOME=/app \
+    APP_USER=openclaw \
+    APP_GROUP=openclaw \
+    PYTHONPATH=/app
+
+# Create non-root user
+RUN groupadd --gid 1000 ${APP_GROUP} && \
+    useradd --uid 1000 --gid ${APP_GROUP} \
+    --shell /bin/bash --create-home ${APP_USER}
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR ${APP_HOME}
+
+# Copy Python packages from builder
+COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
+
+# Copy application code
+COPY --chown=${APP_USER}:${APP_GROUP} devclaw_runner/ ./devclaw_runner/
+COPY --chown=${APP_USER}:${APP_GROUP} shared/ ./shared/
+COPY --chown=${APP_USER}:${APP_GROUP} openclaw/ ./openclaw/
+COPY --chown=${APP_USER}:${APP_GROUP} deploy/ ./deploy/
+
+# Create required directories
+RUN mkdir -p data/audit_logs data/backups data/cache logs && \
+    chown -R ${APP_USER}:${APP_GROUP} data logs
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD python -m deploy.health_check --docker || exit 1
+
+# Switch to non-root user
+USER ${APP_USER}
+
+# Expose port for health check endpoint
+EXPOSE 8080
+
+# Default command
+CMD ["python", "-m", "devclaw_runner.src.prediction_markets.arb_scanner"]
+
+# -----------------------------------------------------------------------------
+# Development stage
+# -----------------------------------------------------------------------------
+FROM builder AS development
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app
+
+WORKDIR /app
+
+# Install all dependencies (including dev)
+RUN poetry install --no-interaction --no-ansi
+
+# Copy all code
+COPY . .
+
+# Run as root for development (allows package installation)
+CMD ["bash"]
+
+# -----------------------------------------------------------------------------
+# Health check service stage
+# -----------------------------------------------------------------------------
+FROM production AS healthcheck
+
+# Override command to run health check endpoint
+CMD ["python", "-m", "uvicorn", "deploy.health_check:app", "--host", "0.0.0.0", "--port", "8080"]

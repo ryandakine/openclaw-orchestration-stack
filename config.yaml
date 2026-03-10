@@ -1,0 +1,128 @@
+# Sportsbook/Arbitrage Hunter Configuration
+# Main configuration file for the arbitrage detection service
+
+# =============================================================================
+# Scheduling Configuration
+# =============================================================================
+scan_interval_minutes: 5
+
+# =============================================================================
+# Arbitrage Detection Thresholds
+# =============================================================================
+min_profit_threshold: 0.02  # Minimum 2% profit to trigger alert
+min_edge_percent: 2.0       # Minimum edge percentage
+min_profit_per_unit: 10.0   # Minimum profit per unit currency
+max_stake_per_leg: 1000.0   # Maximum stake per bet leg
+max_total_exposure: 5000.0  # Maximum total exposure across all positions
+
+# =============================================================================
+# Sports Configuration
+# =============================================================================
+sports_to_scan:
+  - NBA
+  - NFL
+  - MLB
+  - NHL
+  - NCAAF
+  - NCAAB
+  - Soccer
+  - Tennis
+
+# =============================================================================
+# Alert Configuration
+# =============================================================================
+telegram_enabled: false
+telegram_bot_token: null    # Set via TELEGRAM_BOT_TOKEN env var
+telegram_chat_id: null      # Set via TELEGRAM_CHAT_ID env var
+
+# Alert filtering
+top_n_alerts: 10            # Number of top alerts to send
+alert_high_priority_threshold: 5.0   # Edge % for high priority
+alert_medium_priority_threshold: 3.0 # Edge % for medium priority
+
+# =============================================================================
+# Data Sources Configuration
+# =============================================================================
+sources:
+  # Sportsbooks
+  draftkings:
+    enabled: true
+    api_key: null           # Set via DRAFTKINGS_API_KEY env var
+    api_url: "https://sportsbook.draftkings.com/api/sports/v3/events"
+    
+  fanduel:
+    enabled: true
+    api_key: null           # Set via FANDUEL_API_KEY env var
+    api_url: "https://sportsbook.fanduel.com/api/events"
+    
+  betmgm:
+    enabled: false          # Disabled by default
+    api_key: null           # Set via BETMGM_API_KEY env var
+    api_url: "https://sports.betmgm.com/api/sports/v2/events"
+    
+  caesars:
+    enabled: false          # Disabled by default
+    api_key: null           # Set via CAESARS_API_KEY env var
+    api_url: "https://api.caesars.com/sportsbook/v1/events"
+  
+  # Prediction Markets
+  polymarket:
+    enabled: true
+    api_key: null           # Set via POLYMARKET_API_KEY env var (optional)
+    api_url: "https://gamma-api.polymarket.com/markets"
+    
+  kalshi:
+    enabled: false
+    api_key: null           # Set via KALSHI_API_KEY env var
+    api_secret: null        # Set via KALSHI_API_SECRET env var
+    api_url: "https://trading-api.kalshi.com/trade-api/v2"
+
+# =============================================================================
+# Database Configuration
+# =============================================================================
+database:
+  enabled: true
+  url: null                 # Set via DATABASE_URL env var, or use individual params below
+  host: "localhost"
+  port: 5432
+  name: "openclaw"
+  user: "openclaw"
+  password: null            # Set via DB_PASSWORD env var
+  pool_size: 10
+  max_overflow: 20
+
+# =============================================================================
+# Execution Settings
+# =============================================================================
+dry_run: false             # When true, runs once and prints results without sending alerts
+enabled: true              # Master switch to enable/disable the service
+max_concurrent_requests: 10
+request_delay_seconds: 0.1
+fetch_timeout_seconds: 30.0
+total_scan_timeout_seconds: 300.0
+
+# =============================================================================
+# Logging Configuration
+# =============================================================================
+logging:
+  level: "INFO"           # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  format: "structured"    # structured or simple
+  log_file: "./logs/arbitrage_hunter.log"
+  max_file_size_mb: 100
+  backup_count: 5
+  console_output: true
+
+# =============================================================================
+# Audit & Monitoring
+# =============================================================================
+audit_logging:
+  enabled: true
+  path: "./logs/audit"
+  
+metrics:
+  enabled: true
+  port: 9090
+  
+health_check:
+  enabled: true
+  interval_seconds: 30

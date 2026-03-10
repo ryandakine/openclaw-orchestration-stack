@@ -1,179 +1,253 @@
--- OpenClaw Orchestration Stack - Database Schema
--- Version: 1.0.0
+-- OpenClaw Orchestration Stack - SQLite Database Schema
+-- Version: 1.2.1
 
--- Enable WAL mode for better concurrency
-PRAGMA journal_mode = WAL;
-PRAGMA foreign_keys = ON;
-
--- =====================================================
--- TASKS TABLE
--- Stores all tasks in the system with their state
--- =====================================================
+-- ============================================================================
+-- Tasks Table - Core task storage
+-- ============================================================================
 CREATE TABLE IF NOT EXISTS tasks (
     id TEXT PRIMARY KEY,
-    correlation_id TEXT NOT NULL,
-    idempotency_key TEXT UNIQUE NOT NULL,
-    status TEXT NOT NULL CHECK (status IN (
-        'queued', 'executing', 'review_queued', 
-        'approved', 'merged', 'failed', 'blocked', 
-        'review_failed', 'remediation_queued'
-    )),
-    assigned_to TEXT NOT NULL CHECK (assigned_to IN ('DEVCLAW', 'SYMPHONY', 'N8N', 'MCP')),
-    
-    -- Queue leasing fields
-    claimed_by TEXT,
-    claimed_at TIMESTAMP,
-    lease_expires_at TIMESTAMP,
-    
-    -- Retry and metadata
-    retry_count INTEGER DEFAULT 0,
-    max_retries INTEGER DEFAULT 3,
-    
-    -- Task payload
-    intent TEXT NOT NULL,
-    payload JSON,
-    
-    -- Audit timestamps
+    title TEXT NOT NULL,
+    description TEXT,
+    status TEXT NOT NULL DEFAULT 'pending' 
+        CHECK (status IN ('pending', 'in_progress', 'completed', 'failed', 'cancelled')),
+    priority INTEGER DEFAULT 3 CHECK (priority BETWEEN 1 AND 5),
+    intent TEXT,
+    route_target TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    started_at TIMESTAMP,
     completed_at TIMESTAMP,
-    
-    -- Source tracking
-    requested_by TEXT,
-    source TEXT CHECK (source IN ('chat', 'github_pr', 'github_issue', 'cron', 'api'))
+    worker_id TEXT,
+    result TEXT,
+    error_message TEXT,
+    metadata TEXT,  -- JSON blob
+    parent_task_id TEXT,
+    FOREIGN KEY (parent_task_id) REFERENCES tasks(id)
 );
 
--- Indexes for tasks table
 CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);
-CREATE INDEX IF NOT EXISTS idx_tasks_correlation_id ON tasks(correlation_id);
-CREATE INDEX IF NOT EXISTS idx_tasks_lease_expires ON tasks(lease_expires_at) WHERE claimed_by IS NOT NULL;
-CREATE INDEX IF NOT EXISTS idx_tasks_claimed_by ON tasks(claimed_by) WHERE claimed_by IS NOT NULL;
-CREATE INDEX IF NOT EXISTS idx_tasks_created_at ON tasks(created_at);
-CREATE INDEX IF NOT EXISTS idx_tasks_idempotency ON tasks(idempotency_key);
+CREATE INDEX IF NOT EXISTS idx_tasks_priority ON tasks(priority);
+CREATE INDEX IF NOT EXISTS idx_tasks_created ON tasks(created_at);
+CREATE INDEX IF NOT EXISTS idx_tasks_worker ON tasks(worker_id);
 
--- =====================================================
--- REVIEWS TABLE
--- Stores review results for completed tasks
--- =====================================================
+-- ============================================================================
+-- Task Queue Table - For lease-based work distribution
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS task_queue (
+    task_id TEXT PRIMARY KEY,
+    status TEXT NOT NULL DEFAULT 'queued' 
+        CHECK (status IN ('queued', 'leased', 'completed', 'failed')),
+    lease_expires_at TIMESTAMP,
+    worker_id TEXT,
+    lease_count INTEGER DEFAULT 0,
+    max_leases INTEGER DEFAULT 3,
+    queued_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_queue_status ON task_queue(status);
+CREATE INDEX IF NOT EXISTS idx_queue_lease ON task_queue(lease_expires_at);
+
+-- ============================================================================
+-- Workers Table - Worker registration and health
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS workers (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    status TEXT DEFAULT 'active' 
+        CHECK (status IN ('active', 'paused', 'offline', 'disabled')),
+    capabilities TEXT,  -- JSON array of capabilities
+    last_heartbeat TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    total_tasks_completed INTEGER DEFAULT 0,
+    total_tasks_failed INTEGER DEFAULT 0,
+    metadata TEXT  -- JSON blob
+);
+
+CREATE INDEX IF NOT EXISTS idx_workers_status ON workers(status);
+CREATE INDEX IF NOT EXISTS idx_workers_heartbeat ON workers(last_heartbeat);
+
+-- ============================================================================
+-- Reviews Table - Code review tracking
+-- ============================================================================
 CREATE TABLE IF NOT EXISTS reviews (
     id TEXT PRIMARY KEY,
-    task_id TEXT NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
-    
-    -- Review result
-    result TEXT NOT NULL CHECK (result IN ('approve', 'reject', 'blocked')),
-    summary TEXT NOT NULL,
-    findings JSON, -- Array of finding objects
-    
-    -- Reviewer info
-    reviewer_id TEXT NOT NULL,
-    reviewer_role TEXT DEFAULT 'symphony',
-    
-    -- Review metadata
-    started_at TIMESTAMP,
-    completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    
-    -- Optional link to PR comment
-    pr_comment_url TEXT
+    repository TEXT NOT NULL,
+    pr_number INTEGER NOT NULL,
+    commit_sha TEXT,
+    status TEXT DEFAULT 'pending' 
+        CHECK (status IN ('pending', 'in_progress', 'completed', 'failed')),
+    reviewer TEXT,  -- worker_id or 'ai'
+    started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    completed_at TIMESTAMP,
+    summary TEXT,
+    findings_count INTEGER DEFAULT 0,
+    metadata TEXT,  -- JSON blob
+    UNIQUE(repository, pr_number, commit_sha)
 );
 
--- Indexes for reviews table
-CREATE INDEX IF NOT EXISTS idx_reviews_task_id ON reviews(task_id);
-CREATE INDEX IF NOT EXISTS idx_reviews_result ON reviews(result);
-CREATE INDEX IF NOT EXISTS idx_reviews_completed_at ON reviews(completed_at);
+CREATE INDEX IF NOT EXISTS idx_reviews_repo ON reviews(repository);
+CREATE INDEX IF NOT EXISTS idx_reviews_status ON reviews(status);
 
--- =====================================================
--- AUDIT_EVENTS TABLE
--- Append-only audit log for all operations
--- =====================================================
-CREATE TABLE IF NOT EXISTS audit_events (
+-- ============================================================================
+-- Review Findings Table - Individual review comments/issues
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS review_findings (
+    id TEXT PRIMARY KEY,
+    review_id TEXT NOT NULL,
+    file_path TEXT NOT NULL,
+    line_number INTEGER,
+    severity TEXT CHECK (severity IN ('critical', 'warning', 'suggestion', 'praise')),
+    category TEXT,  -- security, performance, style, etc.
+    message TEXT NOT NULL,
+    suggestion TEXT,
+    code_snippet TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (review_id) REFERENCES reviews(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_findings_review ON review_findings(review_id);
+CREATE INDEX IF NOT EXISTS idx_findings_severity ON review_findings(severity);
+
+-- ============================================================================
+-- Audit Log Table - System events
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS audit_log (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    correlation_id TEXT NOT NULL,
-    
-    -- Event details
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    actor TEXT NOT NULL, -- 'openclaw', 'devclaw', 'symphony', 'n8n', 'system'
-    action TEXT NOT NULL, -- 'task.created', 'task.claimed', 'task.completed', etc.
-    
-    -- Payload
-    payload JSON,
-    
-    -- Source info
-    ip_address TEXT,
-    user_agent TEXT
+    level TEXT CHECK (level IN ('DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL')),
+    component TEXT NOT NULL,  -- api, worker, symphony, etc.
+    event_type TEXT NOT NULL,
+    task_id TEXT,
+    worker_id TEXT,
+    message TEXT NOT NULL,
+    metadata TEXT  -- JSON blob
 );
 
--- Indexes for audit_events table (note: no unique constraints to maintain append-only)
-CREATE INDEX IF NOT EXISTS idx_audit_correlation_id ON audit_events(correlation_id);
-CREATE INDEX IF NOT EXISTS idx_audit_timestamp ON audit_events(timestamp);
-CREATE INDEX IF NOT EXISTS idx_audit_actor ON audit_events(actor);
-CREATE INDEX IF NOT EXISTS idx_audit_action ON audit_events(action);
+CREATE INDEX IF NOT EXISTS idx_audit_timestamp ON audit_log(timestamp);
+CREATE INDEX IF NOT EXISTS idx_audit_component ON audit_log(component);
+CREATE INDEX IF NOT EXISTS idx_audit_task ON audit_log(task_id);
 
--- Composite index for common query patterns
-CREATE INDEX IF NOT EXISTS idx_audit_actor_action_time ON audit_events(actor, action, timestamp);
-
--- =====================================================
--- IDEMPOTENCY KEYS TABLE
--- For tracking and deduplicating requests
--- =====================================================
+-- ============================================================================
+-- Idempotency Keys Table - Prevent duplicate operations
+-- ============================================================================
 CREATE TABLE IF NOT EXISTS idempotency_keys (
     key TEXT PRIMARY KEY,
-    correlation_id TEXT NOT NULL,
+    operation TEXT NOT NULL,
+    status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'completed', 'failed')),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    expires_at TIMESTAMP, -- Optional TTL
-    response JSON -- Cached response for duplicate requests
+    expires_at TIMESTAMP,
+    response TEXT  -- Cached response for completed operations
 );
 
-CREATE INDEX IF NOT EXISTS idx_idempotency_expires ON idempotency_keys(expires_at) WHERE expires_at IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_idempotency_expires ON idempotency_keys(expires_at);
 
--- =====================================================
--- DEAD LETTER QUEUE
--- For tasks that failed permanently
--- =====================================================
-CREATE TABLE IF NOT EXISTS dead_letter_tasks (
+-- ============================================================================
+-- Webhook Events Table - GitHub webhook tracking
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS webhook_events (
     id TEXT PRIMARY KEY,
-    original_task_id TEXT NOT NULL,
-    correlation_id TEXT NOT NULL,
-    failed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    reason TEXT NOT NULL,
-    error_details JSON,
-    original_payload JSON
+    source TEXT NOT NULL,  -- github, gitlab, etc.
+    event_type TEXT NOT NULL,  -- pull_request, push, etc.
+    payload TEXT NOT NULL,  -- JSON payload
+    signature TEXT,
+    processed BOOLEAN DEFAULT FALSE,
+    processing_result TEXT,
+    received_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    processed_at TIMESTAMP
 );
 
-CREATE INDEX IF NOT EXISTS idx_dlq_correlation_id ON dead_letter_tasks(correlation_id);
-CREATE INDEX IF NOT EXISTS idx_dlq_failed_at ON dead_letter_tasks(failed_at);
+CREATE INDEX IF NOT EXISTS idx_webhook_source ON webhook_events(source);
+CREATE INDEX IF NOT EXISTS idx_webhook_processed ON webhook_events(processed);
 
--- =====================================================
--- VIEWS FOR COMMON QUERIES
--- =====================================================
+-- ============================================================================
+-- Configuration Table - System settings
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS configuration (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL,
+    description TEXT,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
--- View: Tasks ready to be claimed (queued and lease expired or never claimed)
-CREATE VIEW IF NOT EXISTS v_tasks_available AS
-SELECT * FROM tasks 
-WHERE status = 'queued' 
-  AND (claimed_by IS NULL OR lease_expires_at < datetime('now'));
+-- Default configuration
+INSERT OR IGNORE INTO configuration (key, value, description) VALUES
+    ('max_workers', '5', 'Maximum number of concurrent workers'),
+    ('task_timeout', '300', 'Task execution timeout in seconds'),
+    ('lease_duration', '300', 'Task lease duration in seconds'),
+    ('max_retries', '3', 'Maximum task retry attempts'),
+    ('enable_audit_log', 'true', 'Enable detailed audit logging'),
+    ('github_webhook_secret', '', 'GitHub webhook secret'),
+    ('api_rate_limit', '100', 'API requests per minute per client');
 
--- View: Stuck tasks (claimed but lease expired)
-CREATE VIEW IF NOT EXISTS v_tasks_stuck AS
-SELECT * FROM tasks 
-WHERE claimed_by IS NOT NULL 
-  AND lease_expires_at < datetime('now')
-  AND status IN ('executing', 'review_queued');
+-- ============================================================================
+-- Views for Common Queries
+-- ============================================================================
 
--- View: Task metrics summary
-CREATE VIEW IF NOT EXISTS v_task_metrics AS
+-- Active tasks view
+CREATE VIEW IF NOT EXISTS v_active_tasks AS
 SELECT 
-    status,
-    assigned_to,
-    COUNT(*) as count,
-    AVG(julianday('now') - julianday(created_at)) * 24 * 60 as avg_age_minutes
-FROM tasks
-GROUP BY status, assigned_to;
+    t.*,
+    w.name as worker_name
+FROM tasks t
+LEFT JOIN workers w ON t.worker_id = w.id
+WHERE t.status IN ('pending', 'in_progress')
+ORDER BY t.priority ASC, t.created_at ASC;
 
--- =====================================================
--- TRIGGERS FOR AUTOMATIC TIMESTAMP UPDATES
--- =====================================================
-CREATE TRIGGER IF NOT EXISTS tr_tasks_updated_at
+-- Worker performance view
+CREATE VIEW IF NOT EXISTS v_worker_stats AS
+SELECT 
+    w.id,
+    w.name,
+    w.status,
+    w.total_tasks_completed,
+    w.total_tasks_failed,
+    CASE 
+        WHEN w.total_tasks_completed + w.total_tasks_failed = 0 THEN 0
+        ELSE (w.total_tasks_completed * 100.0 / (w.total_tasks_completed + w.total_tasks_failed))
+    END as success_rate,
+    w.last_heartbeat
+FROM workers w;
+
+-- Review summary view
+CREATE VIEW IF NOT EXISTS v_review_summary AS
+SELECT 
+    r.*,
+    COUNT(f.id) as total_findings,
+    SUM(CASE WHEN f.severity = 'critical' THEN 1 ELSE 0 END) as critical_count,
+    SUM(CASE WHEN f.severity = 'warning' THEN 1 ELSE 0 END) as warning_count,
+    SUM(CASE WHEN f.severity = 'suggestion' THEN 1 ELSE 0 END) as suggestion_count
+FROM reviews r
+LEFT JOIN review_findings f ON r.id = f.review_id
+GROUP BY r.id;
+
+-- ============================================================================
+-- Triggers for Updated Timestamps
+-- ============================================================================
+
+CREATE TRIGGER IF NOT EXISTS update_tasks_timestamp 
 AFTER UPDATE ON tasks
 BEGIN
     UPDATE tasks SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;
 END;
+
+-- ============================================================================
+-- Cleanup Procedure (run periodically)
+-- ============================================================================
+
+-- Delete old completed tasks (keep 30 days)
+DELETE FROM tasks 
+WHERE status IN ('completed', 'failed', 'cancelled') 
+AND completed_at < datetime('now', '-30 days');
+
+-- Delete expired idempotency keys
+DELETE FROM idempotency_keys 
+WHERE expires_at < datetime('now');
+
+-- Delete old processed webhooks (keep 7 days)
+DELETE FROM webhook_events 
+WHERE processed = TRUE 
+AND received_at < datetime('now', '-7 days');
+
+-- Vacuum to reclaim space
+VACUUM;

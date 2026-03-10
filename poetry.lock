@@ -1,0 +1,44 @@
+[[package]]
+name = "fastapi"
+version = "0.104.1"
+description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
+optional = false
+python-versions = ">=3.8"
+files = []
+
+[package.dependencies]
+pydantic = ">=2.0.0"
+starlette = ">=0.27.0"
+
+[[package]]
+name = "uvicorn"
+version = "0.24.0"
+description = "The lightning-fast ASGI server."
+optional = false
+python-versions = ">=3.8"
+files = []
+
+[package.dependencies]
+click = ">=7.0"
+httptools = {version = ">=0.5.0", optional = true}
+python-dotenv = {version = ">=0.13", optional = true}
+pyyaml = {version = ">=5.1", optional = true}
+uvloop = {version = ">=0.14.0", optional = true}
+watchfiles = {version = ">=0.13", optional = true}
+websockets = {version = ">=10.4", optional = true}
+
+[package.extras]
+standard = ["colorama (>=0.4)", "httptools (>=0.5.0)", "python-dotenv (>=0.13)", "pyyaml (>=5.1)", "uvloop (>=0.14.0)", "watchfiles (>=0.13)", "websockets (>=10.4)"]
+
+[[package]]
+name = "pydantic"
+version = "2.5.0"
+description = "Data validation using Python type hints"
+optional = false
+python-versions = ">=3.7"
+files = []
+
+[metadata]
+lock-version = "2.0"
+python-versions = "^3.11"
+content-hash = "d41d8cd98f00b204e9800998ecf8427e"

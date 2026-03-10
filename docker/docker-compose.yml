@@ -61,7 +61,7 @@ services:
       dockerfile: docker/Dockerfile
       target: worker
     image: openclaw/worker:latest
-    container_name: openclaw-worker
+    # container_name removed for replicas support
     restart: unless-stopped
     environment:
       - ENVIRONMENT=${ENVIRONMENT:-production}
@@ -208,7 +208,7 @@ services:
     container_name: openclaw-grafana
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "3002:3000"
     environment:
       - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}

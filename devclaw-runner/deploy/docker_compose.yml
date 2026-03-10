@@ -1,0 +1,241 @@
+# OpenClaw Arbitrage Hunter - Docker Compose
+# Production deployment with monitoring and health checks
+
+version: "3.8"
+
+services:
+  # Main arbitrage scanner service
+  arb-scanner:
+    build:
+      context: ../..
+      dockerfile: devclaw-runner/deploy/dockerfile
+      target: production
+    image: openclaw/arb-hunter:latest
+    container_name: openclaw-arb-scanner
+    restart: unless-stopped
+    
+    environment:
+      # Core settings
+      - PYTHONPATH=/app
+      - ENVIRONMENT=production
+      
+      # API Keys (set in .env file)
+      - POLYMARKET_API_KEY=${POLYMARKET_API_KEY:-}
+      - KALSHI_API_KEY=${KALSHI_API_KEY:-}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID:-}
+      
+      # Scanner settings
+      - MIN_LIQUIDITY=${MIN_LIQUIDITY:-10000}
+      - MIN_EV_PCT=${MIN_EV_PCT:-2.0}
+      - SCAN_TIMEOUT=${SCAN_TIMEOUT:-300}
+      
+      # Logging
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - STRUCTLOG_FORMAT=${STRUCTLOG_FORMAT:-json}
+    
+    env_file:
+      - ../../.env
+    
+    volumes:
+      # Persist data
+      - arb_data:/app/data
+      - arb_logs:/app/logs
+      
+      # Mount for config updates
+      - ../../config:/app/config:ro
+    
+    networks:
+      - openclaw-network
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "python", "-m", "deploy.health_check", "--docker"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        labels: "service_name,environment"
+        tags: "{{.ImageName}}/{{.Name}}/{{.ID}}"
+
+  # Health check endpoint service
+  health-api:
+    build:
+      context: ../..
+      dockerfile: devclaw-runner/deploy/dockerfile
+      target: healthcheck
+    image: openclaw/arb-hunter:latest
+    container_name: openclaw-health-api
+    restart: unless-stopped
+    
+    environment:
+      - PYTHONPATH=/app
+      - ENVIRONMENT=production
+      - HEALTH_CHECK_PORT=8080
+    
+    env_file:
+      - ../../.env
+    
+    ports:
+      - "${HEALTH_CHECK_PORT:-8080}:8080"
+    
+    volumes:
+      - arb_data:/app/data:ro
+    
+    networks:
+      - openclaw-network
+    
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+    
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # Prometheus metrics exporter
+  prometheus:
+    image: prom/prometheus:v2.48.1
+    container_name: openclaw-prometheus
+    restart: unless-stopped
+    
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    
+    networks:
+      - openclaw-network
+    
+    profiles:
+      - monitoring
+
+  # Grafana dashboard
+  grafana:
+    image: grafana/grafana:10.2.3
+    container_name: openclaw-grafana
+    restart: unless-stopped
+    
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./config/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./config/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+    
+    networks:
+      - openclaw-network
+    
+    profiles:
+      - monitoring
+
+  # Backup service - runs periodically
+  backup:
+    build:
+      context: ../..
+      dockerfile: devclaw-runner/deploy/dockerfile
+      target: production
+    image: openclaw/arb-hunter:latest
+    container_name: openclaw-backup
+    restart: "no"
+    
+    environment:
+      - PYTHONPATH=/app
+      - BACKUP_TYPE=docker
+    
+    env_file:
+      - ../../.env
+    
+    volumes:
+      - arb_data:/app/data:ro
+      - arb_backups:/app/backups
+      - ${BACKUP_HOST_PATH:-./backups}:/app/backups/host
+    
+    networks:
+      - openclaw-network
+    
+    # Run backup and exit
+    command: ["python", "-m", "deploy.backup_script", "--destination", "/app/backups/host"]
+    
+    profiles:
+      - backup
+
+  # Scheduled backup using ofelia
+  scheduler:
+    image: mcuadros/ofelia:latest
+    container_name: openclaw-scheduler
+    restart: unless-stopped
+    depends_on:
+      - backup
+    
+    command: daemon --docker
+    
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    
+    networks:
+      - openclaw-network
+    
+    labels:
+      # Run backup daily at 4 AM
+      ofelia.job-run.backup.schedule: "0 0 4 * * *"
+      ofelia.job-run.backup.container: "openclaw-backup"
+    
+    profiles:
+      - backup
+
+# Volumes
+volumes:
+  arb_data:
+    driver: local
+  arb_logs:
+    driver: local
+  arb_backups:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+
+# Networks
+networks:
+  openclaw-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
