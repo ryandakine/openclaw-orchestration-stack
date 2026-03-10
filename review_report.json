@@ -1,0 +1,2708 @@
+{
+  "review_timestamp": "2026-03-09T20:04:35.095765",
+  "total_files": 101,
+  "total_findings": 236,
+  "overall_score": 95.85,
+  "component_reports": {
+    "OpenClaw": {
+      "timestamp": "2026-03-09T20:04:34.986177",
+      "files_reviewed": 8,
+      "total_findings": 25,
+      "severity_breakdown": {
+        "critical": 1,
+        "high": 0,
+        "medium": 0,
+        "low": 24
+      },
+      "category_breakdown": {
+        "style": 24,
+        "security": 1
+      },
+      "average_score": 93.88,
+      "findings": [
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 29,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 235,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 236,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 237,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 238,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 239,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 240,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 241,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 242,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 243,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 244,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 245,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 247,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 393,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/router.py",
+          "line": 26,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/router.py",
+          "line": 31,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/router.py",
+          "line": 145,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/intent.py",
+          "line": 336,
+          "severity": "critical",
+          "category": "security",
+          "message": "eval() usage - dangerous code execution",
+          "suggestion": "Use safer alternatives or validate inputs"
+        },
+        {
+          "file": "openclaw/src/intent.py",
+          "line": 351,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/api.py",
+          "line": 421,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/api.py",
+          "line": 427,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/idempotency.py",
+          "line": 175,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/audit.py",
+          "line": 109,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/audit.py",
+          "line": 222,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/audit.py",
+          "line": 250,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        }
+      ],
+      "file_reviews": [
+        {
+          "file": "openclaw/src/conductor.py",
+          "lines": 229,
+          "findings": [],
+          "score": 100
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "lines": 421,
+          "findings": [
+            {
+              "file": "openclaw/src/emitter.py",
+              "line": 29,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "openclaw/src/emitter.py",
+              "line": 235,
+              "severity": "low",
+              "category": "style",
+              "message": "Debug print statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "openclaw/src/emitter.py",
+              "line": 236,
+              "severity": "low",
+              "category": "style",
+              "message": "Debug print statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "openclaw/src/emitter.py",
+              "line": 237,
+              "severity": "low",
+              "category": "style",
+              "message": "Debug print statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "openclaw/src/emitter.py",
+              "line": 238,
+              "severity": "low",
+              "category": "style",
+              "message": "Debug print statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "openclaw/src/emitter.py",
+              "line": 239,
+              "severity": "low",
+              "category": "style",
+              "message": "Debug print statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "openclaw/src/emitter.py",
+              "line": 240,
+              "severity": "low",
+              "category": "style",
+              "message": "Debug print statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "openclaw/src/emitter.py",
+              "line": 241,
+              "severity": "low",
+              "category": "style",
+              "message": "Debug print statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "openclaw/src/emitter.py",
+              "line": 242,
+              "severity": "low",
+              "category": "style",
+              "message": "Debug print statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "openclaw/src/emitter.py",
+              "line": 243,
+              "severity": "low",
+              "category": "style",
+              "message": "Debug print statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "openclaw/src/emitter.py",
+              "line": 244,
+              "severity": "low",
+              "category": "style",
+              "message": "Debug print statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "openclaw/src/emitter.py",
+              "line": 245,
+              "severity": "low",
+              "category": "style",
+              "message": "Debug print statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "openclaw/src/emitter.py",
+              "line": 247,
+              "severity": "low",
+              "category": "style",
+              "message": "Debug print statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "openclaw/src/emitter.py",
+              "line": 393,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            }
+          ],
+          "score": 86
+        },
+        {
+          "file": "openclaw/src/router.py",
+          "lines": 495,
+          "findings": [
+            {
+              "file": "openclaw/src/router.py",
+              "line": 26,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "openclaw/src/router.py",
+              "line": 31,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "openclaw/src/router.py",
+              "line": 145,
+              "severity": "low",
+              "category": "style",
+              "message": "Debug print statement",
+              "suggestion": "Clean up code style"
+            }
+          ],
+          "score": 97
+        },
+        {
+          "file": "openclaw/src/intent.py",
+          "lines": 353,
+          "findings": [
+            {
+              "file": "openclaw/src/intent.py",
+              "line": 336,
+              "severity": "critical",
+              "category": "security",
+              "message": "eval() usage - dangerous code execution",
+              "suggestion": "Use safer alternatives or validate inputs"
+            },
+            {
+              "file": "openclaw/src/intent.py",
+              "line": 351,
+              "severity": "low",
+              "category": "style",
+              "message": "Debug print statement",
+              "suggestion": "Clean up code style"
+            }
+          ],
+          "score": 74
+        },
+        {
+          "file": "openclaw/src/api.py",
+          "lines": 435,
+          "findings": [
+            {
+              "file": "openclaw/src/api.py",
+              "line": 421,
+              "severity": "low",
+              "category": "style",
+              "message": "Debug print statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "openclaw/src/api.py",
+              "line": 427,
+              "severity": "low",
+              "category": "style",
+              "message": "Debug print statement",
+              "suggestion": "Clean up code style"
+            }
+          ],
+          "score": 98
+        },
+        {
+          "file": "openclaw/src/__init__.py",
+          "lines": 5,
+          "findings": [],
+          "score": 100
+        },
+        {
+          "file": "openclaw/src/idempotency.py",
+          "lines": 546,
+          "findings": [
+            {
+              "file": "openclaw/src/idempotency.py",
+              "line": 175,
+              "severity": "low",
+              "category": "style",
+              "message": "Debug print statement",
+              "suggestion": "Clean up code style"
+            }
+          ],
+          "score": 99
+        },
+        {
+          "file": "openclaw/src/audit.py",
+          "lines": 518,
+          "findings": [
+            {
+              "file": "openclaw/src/audit.py",
+              "line": 109,
+              "severity": "low",
+              "category": "style",
+              "message": "Debug print statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "openclaw/src/audit.py",
+              "line": 222,
+              "severity": "low",
+              "category": "style",
+              "message": "Debug print statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "openclaw/src/audit.py",
+              "line": 250,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            }
+          ],
+          "score": 97
+        }
+      ]
+    },
+    "DevClaw Runner": {
+      "timestamp": "2026-03-09T20:04:35.001152",
+      "files_reviewed": 12,
+      "total_findings": 40,
+      "severity_breakdown": {
+        "critical": 1,
+        "high": 0,
+        "medium": 0,
+        "low": 39
+      },
+      "category_breakdown": {
+        "style": 39,
+        "security": 1
+      },
+      "average_score": 96.25,
+      "findings": [
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 29,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 235,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 236,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 237,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 238,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 239,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 240,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 241,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 242,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 243,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 244,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 245,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 247,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 393,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/router.py",
+          "line": 26,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/router.py",
+          "line": 31,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/router.py",
+          "line": 145,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/intent.py",
+          "line": 336,
+          "severity": "critical",
+          "category": "security",
+          "message": "eval() usage - dangerous code execution",
+          "suggestion": "Use safer alternatives or validate inputs"
+        },
+        {
+          "file": "openclaw/src/intent.py",
+          "line": 351,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/api.py",
+          "line": 421,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/api.py",
+          "line": 427,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/idempotency.py",
+          "line": 175,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/audit.py",
+          "line": 109,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/audit.py",
+          "line": 222,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/audit.py",
+          "line": 250,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/git_ops.py",
+          "line": 20,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/git_ops.py",
+          "line": 25,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/git_ops.py",
+          "line": 30,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/git_ops.py",
+          "line": 35,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/git_ops.py",
+          "line": 40,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/git_ops.py",
+          "line": 208,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/worker.py",
+          "line": 62,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/worker.py",
+          "line": 67,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/task_executor.py",
+          "line": 23,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/task_executor.py",
+          "line": 28,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/task_executor.py",
+          "line": 33,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/task_executor.py",
+          "line": 272,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/task_executor.py",
+          "line": 514,
+          "severity": "low",
+          "category": "style",
+          "message": "TODO/FIXME/XXX found",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/task_executor.py",
+          "line": 567,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/task_executor.py",
+          "line": 572,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        }
+      ],
+      "file_reviews": [
+        {
+          "file": "devclaw-runner/src/git_ops.py",
+          "lines": 611,
+          "findings": [
+            {
+              "file": "devclaw-runner/src/git_ops.py",
+              "line": 20,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "devclaw-runner/src/git_ops.py",
+              "line": 25,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "devclaw-runner/src/git_ops.py",
+              "line": 30,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "devclaw-runner/src/git_ops.py",
+              "line": 35,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "devclaw-runner/src/git_ops.py",
+              "line": 40,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "devclaw-runner/src/git_ops.py",
+              "line": 208,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            }
+          ],
+          "score": 94
+        },
+        {
+          "file": "devclaw-runner/src/worker.py",
+          "lines": 650,
+          "findings": [
+            {
+              "file": "devclaw-runner/src/worker.py",
+              "line": 62,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "devclaw-runner/src/worker.py",
+              "line": 67,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            }
+          ],
+          "score": 98
+        },
+        {
+          "file": "devclaw-runner/src/task_executor.py",
+          "lines": 606,
+          "findings": [
+            {
+              "file": "devclaw-runner/src/task_executor.py",
+              "line": 23,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "devclaw-runner/src/task_executor.py",
+              "line": 28,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "devclaw-runner/src/task_executor.py",
+              "line": 33,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "devclaw-runner/src/task_executor.py",
+              "line": 272,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "devclaw-runner/src/task_executor.py",
+              "line": 514,
+              "severity": "low",
+              "category": "style",
+              "message": "TODO/FIXME/XXX found",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "devclaw-runner/src/task_executor.py",
+              "line": 567,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "devclaw-runner/src/task_executor.py",
+              "line": 572,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            }
+          ],
+          "score": 93
+        },
+        {
+          "file": "devclaw-runner/src/__init__.py",
+          "lines": 31,
+          "findings": [],
+          "score": 100
+        }
+      ]
+    },
+    "Symphony Bridge": {
+      "timestamp": "2026-03-09T20:04:35.048965",
+      "files_reviewed": 30,
+      "total_findings": 48,
+      "severity_breakdown": {
+        "critical": 1,
+        "high": 0,
+        "medium": 0,
+        "low": 47
+      },
+      "category_breakdown": {
+        "style": 47,
+        "security": 1
+      },
+      "average_score": 99.56,
+      "findings": [
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 29,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 235,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 236,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 237,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 238,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 239,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 240,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 241,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 242,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 243,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 244,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 245,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 247,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 393,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/router.py",
+          "line": 26,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/router.py",
+          "line": 31,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/router.py",
+          "line": 145,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/intent.py",
+          "line": 336,
+          "severity": "critical",
+          "category": "security",
+          "message": "eval() usage - dangerous code execution",
+          "suggestion": "Use safer alternatives or validate inputs"
+        },
+        {
+          "file": "openclaw/src/intent.py",
+          "line": 351,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/api.py",
+          "line": 421,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/api.py",
+          "line": 427,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/idempotency.py",
+          "line": 175,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/audit.py",
+          "line": 109,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/audit.py",
+          "line": 222,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/audit.py",
+          "line": 250,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/git_ops.py",
+          "line": 20,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/git_ops.py",
+          "line": 25,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/git_ops.py",
+          "line": 30,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/git_ops.py",
+          "line": 35,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/git_ops.py",
+          "line": 40,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/git_ops.py",
+          "line": 208,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/worker.py",
+          "line": 62,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/worker.py",
+          "line": 67,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/task_executor.py",
+          "line": 23,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/task_executor.py",
+          "line": 28,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/task_executor.py",
+          "line": 33,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/task_executor.py",
+          "line": 272,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/task_executor.py",
+          "line": 514,
+          "severity": "low",
+          "category": "style",
+          "message": "TODO/FIXME/XXX found",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/task_executor.py",
+          "line": 567,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/task_executor.py",
+          "line": 572,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "symphony-bridge/src/core_review_queue.py",
+          "line": 57,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "symphony-bridge/src/github/client.py",
+          "line": 38,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "symphony-bridge/src/github/client.py",
+          "line": 43,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "symphony-bridge/src/github/client.py",
+          "line": 48,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "symphony-bridge/src/github/client.py",
+          "line": 53,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "symphony-bridge/src/github/client.py",
+          "line": 295,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "symphony-bridge/src/github/labels.py",
+          "line": 72,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "symphony-bridge/src/review_queue/queue_manager.py",
+          "line": 96,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        }
+      ],
+      "file_reviews": [
+        {
+          "file": "symphony-bridge/src/webhook_handler.py",
+          "lines": 620,
+          "findings": [],
+          "score": 100
+        },
+        {
+          "file": "symphony-bridge/src/review_state_machine.py",
+          "lines": 80,
+          "findings": [],
+          "score": 100
+        },
+        {
+          "file": "symphony-bridge/src/pr_lifecycle.py",
+          "lines": 622,
+          "findings": [],
+          "score": 100
+        },
+        {
+          "file": "symphony-bridge/src/core_review_queue.py",
+          "lines": 336,
+          "findings": [
+            {
+              "file": "symphony-bridge/src/core_review_queue.py",
+              "line": 57,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            }
+          ],
+          "score": 99
+        },
+        {
+          "file": "symphony-bridge/src/__init__.py",
+          "lines": 107,
+          "findings": [],
+          "score": 100
+        },
+        {
+          "file": "symphony-bridge/src/review/summary.py",
+          "lines": 459,
+          "findings": [],
+          "score": 100
+        },
+        {
+          "file": "symphony-bridge/src/review/reviewer.py",
+          "lines": 573,
+          "findings": [],
+          "score": 100
+        },
+        {
+          "file": "symphony-bridge/src/review/__init__.py",
+          "lines": 47,
+          "findings": [],
+          "score": 100
+        },
+        {
+          "file": "symphony-bridge/src/github/client.py",
+          "lines": 574,
+          "findings": [
+            {
+              "file": "symphony-bridge/src/github/client.py",
+              "line": 38,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "symphony-bridge/src/github/client.py",
+              "line": 43,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "symphony-bridge/src/github/client.py",
+              "line": 48,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "symphony-bridge/src/github/client.py",
+              "line": 53,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "symphony-bridge/src/github/client.py",
+              "line": 295,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            }
+          ],
+          "score": 95
+        },
+        {
+          "file": "symphony-bridge/src/github/labels.py",
+          "lines": 487,
+          "findings": [
+            {
+              "file": "symphony-bridge/src/github/labels.py",
+              "line": 72,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            }
+          ],
+          "score": 99
+        },
+        {
+          "file": "symphony-bridge/src/github/__init__.py",
+          "lines": 33,
+          "findings": [],
+          "score": 100
+        },
+        {
+          "file": "symphony-bridge/src/review_queue/outcomes.py",
+          "lines": 706,
+          "findings": [],
+          "score": 100
+        },
+        {
+          "file": "symphony-bridge/src/review_queue/reviewer_engine.py",
+          "lines": 681,
+          "findings": [],
+          "score": 100
+        },
+        {
+          "file": "symphony-bridge/src/review_queue/queue_manager.py",
+          "lines": 582,
+          "findings": [
+            {
+              "file": "symphony-bridge/src/review_queue/queue_manager.py",
+              "line": 96,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            }
+          ],
+          "score": 99
+        },
+        {
+          "file": "symphony-bridge/src/review_queue/remediation.py",
+          "lines": 605,
+          "findings": [],
+          "score": 100
+        },
+        {
+          "file": "symphony-bridge/src/review_queue/__init__.py",
+          "lines": 22,
+          "findings": [],
+          "score": 100
+        },
+        {
+          "file": "symphony-bridge/src/review_queue/tests/conftest.py",
+          "lines": 18,
+          "findings": [],
+          "score": 100
+        },
+        {
+          "file": "symphony-bridge/src/review_queue/tests/__init__.py",
+          "lines": 10,
+          "findings": [],
+          "score": 100
+        }
+      ]
+    },
+    "Shared Utils": {
+      "timestamp": "2026-03-09T20:04:35.095607",
+      "files_reviewed": 51,
+      "total_findings": 123,
+      "severity_breakdown": {
+        "critical": 3,
+        "high": 1,
+        "medium": 0,
+        "low": 119
+      },
+      "category_breakdown": {
+        "style": 119,
+        "security": 3,
+        "bug": 1
+      },
+      "average_score": 93.71,
+      "findings": [
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 29,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 235,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 236,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 237,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 238,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 239,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 240,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 241,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 242,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 243,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 244,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 245,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 247,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/emitter.py",
+          "line": 393,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/router.py",
+          "line": 26,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/router.py",
+          "line": 31,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/router.py",
+          "line": 145,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/intent.py",
+          "line": 336,
+          "severity": "critical",
+          "category": "security",
+          "message": "eval() usage - dangerous code execution",
+          "suggestion": "Use safer alternatives or validate inputs"
+        },
+        {
+          "file": "openclaw/src/intent.py",
+          "line": 351,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/api.py",
+          "line": 421,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/api.py",
+          "line": 427,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/idempotency.py",
+          "line": 175,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/audit.py",
+          "line": 109,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/audit.py",
+          "line": 222,
+          "severity": "low",
+          "category": "style",
+          "message": "Debug print statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "openclaw/src/audit.py",
+          "line": 250,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/git_ops.py",
+          "line": 20,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/git_ops.py",
+          "line": 25,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/git_ops.py",
+          "line": 30,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/git_ops.py",
+          "line": 35,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/git_ops.py",
+          "line": 40,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/git_ops.py",
+          "line": 208,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/worker.py",
+          "line": 62,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/worker.py",
+          "line": 67,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/task_executor.py",
+          "line": 23,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/task_executor.py",
+          "line": 28,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/task_executor.py",
+          "line": 33,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/task_executor.py",
+          "line": 272,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/task_executor.py",
+          "line": 514,
+          "severity": "low",
+          "category": "style",
+          "message": "TODO/FIXME/XXX found",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/task_executor.py",
+          "line": 567,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "devclaw-runner/src/task_executor.py",
+          "line": 572,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "symphony-bridge/src/core_review_queue.py",
+          "line": 57,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "symphony-bridge/src/github/client.py",
+          "line": 38,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "symphony-bridge/src/github/client.py",
+          "line": 43,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "symphony-bridge/src/github/client.py",
+          "line": 48,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "symphony-bridge/src/github/client.py",
+          "line": 53,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "symphony-bridge/src/github/client.py",
+          "line": 295,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "symphony-bridge/src/github/labels.py",
+          "line": 72,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "symphony-bridge/src/review_queue/queue_manager.py",
+          "line": 96,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        },
+        {
+          "file": "shared/config/command_runner.py",
+          "line": 194,
+          "severity": "critical",
+          "category": "security",
+          "message": "exec() usage - dangerous code execution",
+          "suggestion": "Use safer alternatives or validate inputs"
+        },
+        {
+          "file": "shared/config/command_runner.py",
+          "line": 731,
+          "severity": "low",
+          "category": "style",
+          "message": "Empty pass statement",
+          "suggestion": "Clean up code style"
+        }
+      ],
+      "file_reviews": [
+        {
+          "file": "shared/db.py",
+          "lines": 372,
+          "findings": [],
+          "score": 100
+        },
+        {
+          "file": "shared/__init__.py",
+          "lines": 2,
+          "findings": [],
+          "score": 100
+        },
+        {
+          "file": "shared/config/command_runner.py",
+          "lines": 873,
+          "findings": [
+            {
+              "file": "shared/config/command_runner.py",
+              "line": 194,
+              "severity": "critical",
+              "category": "security",
+              "message": "exec() usage - dangerous code execution",
+              "suggestion": "Use safer alternatives or validate inputs"
+            },
+            {
+              "file": "shared/config/command_runner.py",
+              "line": 731,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            }
+          ],
+          "score": 74
+        },
+        {
+          "file": "shared/config/profiles.py",
+          "lines": 401,
+          "findings": [
+            {
+              "file": "shared/config/profiles.py",
+              "line": 143,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            }
+          ],
+          "score": 99
+        },
+        {
+          "file": "shared/config/language_detector.py",
+          "lines": 828,
+          "findings": [
+            {
+              "file": "shared/config/language_detector.py",
+              "line": 253,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/config/language_detector.py",
+              "line": 282,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/config/language_detector.py",
+              "line": 308,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/config/language_detector.py",
+              "line": 351,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/config/language_detector.py",
+              "line": 453,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/config/language_detector.py",
+              "line": 498,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/config/language_detector.py",
+              "line": 581,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/config/language_detector.py",
+              "line": 608,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/config/language_detector.py",
+              "line": 617,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/config/language_detector.py",
+              "line": 656,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            }
+          ],
+          "score": 90
+        },
+        {
+          "file": "shared/config/review_config.py",
+          "lines": 290,
+          "findings": [
+            {
+              "file": "shared/config/review_config.py",
+              "line": 17,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            }
+          ],
+          "score": 99
+        },
+        {
+          "file": "shared/config/__init__.py",
+          "lines": 42,
+          "findings": [],
+          "score": 100
+        },
+        {
+          "file": "shared/models/__init__.py",
+          "lines": 2,
+          "findings": [],
+          "score": 100
+        },
+        {
+          "file": "shared/utils/dead_letter.py",
+          "lines": 727,
+          "findings": [
+            {
+              "file": "shared/utils/dead_letter.py",
+              "line": 60,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/utils/dead_letter.py",
+              "line": 65,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            }
+          ],
+          "score": 98
+        },
+        {
+          "file": "shared/utils/db_manager.py",
+          "lines": 86,
+          "findings": [],
+          "score": 100
+        },
+        {
+          "file": "shared/utils/lease_manager.py",
+          "lines": 637,
+          "findings": [
+            {
+              "file": "shared/utils/lease_manager.py",
+              "line": 56,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/utils/lease_manager.py",
+              "line": 61,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/utils/lease_manager.py",
+              "line": 66,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/utils/lease_manager.py",
+              "line": 71,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            }
+          ],
+          "score": 96
+        },
+        {
+          "file": "shared/utils/__init__.py",
+          "lines": 112,
+          "findings": [],
+          "score": 100
+        },
+        {
+          "file": "shared/utils/deduplication.py",
+          "lines": 659,
+          "findings": [
+            {
+              "file": "shared/utils/deduplication.py",
+              "line": 32,
+              "severity": "high",
+              "category": "bug",
+              "message": "Python 2 print statement",
+              "suggestion": "Fix the identified issue"
+            },
+            {
+              "file": "shared/utils/deduplication.py",
+              "line": 56,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/utils/deduplication.py",
+              "line": 61,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            }
+          ],
+          "score": 88
+        },
+        {
+          "file": "shared/utils/idempotency.py",
+          "lines": 554,
+          "findings": [
+            {
+              "file": "shared/utils/idempotency.py",
+              "line": 59,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/utils/idempotency.py",
+              "line": 64,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            }
+          ],
+          "score": 98
+        },
+        {
+          "file": "shared/schemas/__init__.py",
+          "lines": 2,
+          "findings": [],
+          "score": 100
+        },
+        {
+          "file": "shared/migrations/runner.py",
+          "lines": 237,
+          "findings": [
+            {
+              "file": "shared/migrations/runner.py",
+              "line": 80,
+              "severity": "low",
+              "category": "style",
+              "message": "Debug print statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/migrations/runner.py",
+              "line": 81,
+              "severity": "low",
+              "category": "style",
+              "message": "Debug print statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/migrations/runner.py",
+              "line": 82,
+              "severity": "low",
+              "category": "style",
+              "message": "Debug print statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/migrations/runner.py",
+              "line": 83,
+              "severity": "low",
+              "category": "style",
+              "message": "Debug print statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/migrations/runner.py",
+              "line": 84,
+              "severity": "low",
+              "category": "style",
+              "message": "Debug print statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/migrations/runner.py",
+              "line": 89,
+              "severity": "low",
+              "category": "style",
+              "message": "Debug print statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/migrations/runner.py",
+              "line": 91,
+              "severity": "low",
+              "category": "style",
+              "message": "Debug print statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/migrations/runner.py",
+              "line": 105,
+              "severity": "low",
+              "category": "style",
+              "message": "Debug print statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/migrations/runner.py",
+              "line": 109,
+              "severity": "low",
+              "category": "style",
+              "message": "Debug print statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/migrations/runner.py",
+              "line": 113,
+              "severity": "low",
+              "category": "style",
+              "message": "Debug print statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/migrations/runner.py",
+              "line": 125,
+              "severity": "low",
+              "category": "style",
+              "message": "Debug print statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/migrations/runner.py",
+              "line": 129,
+              "severity": "low",
+              "category": "style",
+              "message": "Debug print statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/migrations/runner.py",
+              "line": 130,
+              "severity": "low",
+              "category": "style",
+              "message": "Debug print statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/migrations/runner.py",
+              "line": 137,
+              "severity": "low",
+              "category": "style",
+              "message": "Debug print statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/migrations/runner.py",
+              "line": 143,
+              "severity": "low",
+              "category": "style",
+              "message": "Debug print statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/migrations/runner.py",
+              "line": 147,
+              "severity": "low",
+              "category": "style",
+              "message": "Debug print statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/migrations/runner.py",
+              "line": 165,
+              "severity": "critical",
+              "category": "security",
+              "message": "Dynamic __import__() - code injection risk",
+              "suggestion": "Use safer alternatives or validate inputs"
+            },
+            {
+              "file": "shared/migrations/runner.py",
+              "line": 170,
+              "severity": "low",
+              "category": "style",
+              "message": "Trailing semicolon",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/migrations/runner.py",
+              "line": 174,
+              "severity": "low",
+              "category": "style",
+              "message": "Debug print statement",
+              "suggestion": "Clean up code style"
+            }
+          ],
+          "score": 57
+        },
+        {
+          "file": "shared/migrations/__init__.py",
+          "lines": 71,
+          "findings": [
+            {
+              "file": "shared/migrations/__init__.py",
+              "line": 54,
+              "severity": "low",
+              "category": "style",
+              "message": "Debug print statement",
+              "suggestion": "Clean up code style"
+            }
+          ],
+          "score": 99
+        },
+        {
+          "file": "shared/config/tests/conftest.py",
+          "lines": 162,
+          "findings": [
+            {
+              "file": "shared/config/tests/conftest.py",
+              "line": 25,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/config/tests/conftest.py",
+              "line": 26,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            }
+          ],
+          "score": 98
+        },
+        {
+          "file": "shared/config/tests/__init__.py",
+          "lines": 2,
+          "findings": [],
+          "score": 100
+        },
+        {
+          "file": "shared/utils/tests/conftest.py",
+          "lines": 259,
+          "findings": [
+            {
+              "file": "shared/utils/tests/conftest.py",
+              "line": 32,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/utils/tests/conftest.py",
+              "line": 61,
+              "severity": "low",
+              "category": "style",
+              "message": "Trailing semicolon",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/utils/tests/conftest.py",
+              "line": 63,
+              "severity": "low",
+              "category": "style",
+              "message": "Trailing semicolon",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/utils/tests/conftest.py",
+              "line": 64,
+              "severity": "low",
+              "category": "style",
+              "message": "Trailing semicolon",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/utils/tests/conftest.py",
+              "line": 65,
+              "severity": "low",
+              "category": "style",
+              "message": "Trailing semicolon",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/utils/tests/conftest.py",
+              "line": 66,
+              "severity": "low",
+              "category": "style",
+              "message": "Trailing semicolon",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/utils/tests/conftest.py",
+              "line": 67,
+              "severity": "low",
+              "category": "style",
+              "message": "Trailing semicolon",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/utils/tests/conftest.py",
+              "line": 79,
+              "severity": "low",
+              "category": "style",
+              "message": "Trailing semicolon",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/utils/tests/conftest.py",
+              "line": 81,
+              "severity": "low",
+              "category": "style",
+              "message": "Trailing semicolon",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/utils/tests/conftest.py",
+              "line": 82,
+              "severity": "low",
+              "category": "style",
+              "message": "Trailing semicolon",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/utils/tests/conftest.py",
+              "line": 83,
+              "severity": "low",
+              "category": "style",
+              "message": "Trailing semicolon",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/utils/tests/conftest.py",
+              "line": 94,
+              "severity": "low",
+              "category": "style",
+              "message": "Trailing semicolon",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/utils/tests/conftest.py",
+              "line": 96,
+              "severity": "low",
+              "category": "style",
+              "message": "Trailing semicolon",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/utils/tests/conftest.py",
+              "line": 97,
+              "severity": "low",
+              "category": "style",
+              "message": "Trailing semicolon",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/utils/tests/conftest.py",
+              "line": 98,
+              "severity": "low",
+              "category": "style",
+              "message": "Trailing semicolon",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/utils/tests/conftest.py",
+              "line": 112,
+              "severity": "low",
+              "category": "style",
+              "message": "Trailing semicolon",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/utils/tests/conftest.py",
+              "line": 114,
+              "severity": "low",
+              "category": "style",
+              "message": "Trailing semicolon",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/utils/tests/conftest.py",
+              "line": 115,
+              "severity": "low",
+              "category": "style",
+              "message": "Trailing semicolon",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/utils/tests/conftest.py",
+              "line": 116,
+              "severity": "low",
+              "category": "style",
+              "message": "Trailing semicolon",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/utils/tests/conftest.py",
+              "line": 126,
+              "severity": "low",
+              "category": "style",
+              "message": "Trailing semicolon",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/utils/tests/conftest.py",
+              "line": 142,
+              "severity": "low",
+              "category": "style",
+              "message": "Trailing semicolon",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/utils/tests/conftest.py",
+              "line": 144,
+              "severity": "low",
+              "category": "style",
+              "message": "Trailing semicolon",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/utils/tests/conftest.py",
+              "line": 145,
+              "severity": "low",
+              "category": "style",
+              "message": "Trailing semicolon",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/utils/tests/conftest.py",
+              "line": 146,
+              "severity": "low",
+              "category": "style",
+              "message": "Trailing semicolon",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/utils/tests/conftest.py",
+              "line": 147,
+              "severity": "low",
+              "category": "style",
+              "message": "Trailing semicolon",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/utils/tests/conftest.py",
+              "line": 148,
+              "severity": "low",
+              "category": "style",
+              "message": "Trailing semicolon",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/utils/tests/conftest.py",
+              "line": 170,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            },
+            {
+              "file": "shared/utils/tests/conftest.py",
+              "line": 173,
+              "severity": "low",
+              "category": "style",
+              "message": "Empty pass statement",
+              "suggestion": "Clean up code style"
+            }
+          ],
+          "score": 72
+        },
+        {
+          "file": "shared/utils/tests/__init__.py",
+          "lines": 4,
+          "findings": [],
+          "score": 100
+        }
+      ]
+    }
+  }
+}

@@ -1,4 +1,5 @@
 """
+import ast
 Intent Classification Module
 
 Classifies incoming requests into intent categories using keyword matching,
@@ -333,7 +334,7 @@ Respond with JSON format:
         )
         
         result = response.choices[0].message.content
-        data = eval(result)
+        data = ast.literal_eval(result)
         
         category = IntentCategory(data.get("category", "unknown"))
         confidence = float(data.get("confidence", 0.5))
