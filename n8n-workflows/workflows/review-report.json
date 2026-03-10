@@ -1,0 +1,413 @@
+{
+  "name": "Review Report",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "review/report",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "review-report"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Validate review report payload\nconst payload = $input.first().json.body || $input.first().json;\n\nconst required = ['review_id', 'task_id', 'result', 'reviewer_id'];\nconst missing = required.filter(f => !payload[f]);\n\nif (missing.length > 0) {\n  return [{\n    json: {\n      valid: false,\n      error: `Missing required fields: ${missing.join(', ')}`,\n      payload\n    }\n  }];\n}\n\n// Validate result is valid\nconst validResults = ['approve', 'reject', 'blocked'];\nif (!validResults.includes(payload.result)) {\n  return [{\n    json: {\n      valid: false,\n      error: `Invalid result: ${payload.result}. Must be one of: ${validResults.join(', ')}`,\n      payload\n    }\n  }];\n}\n\nreturn [{\n  json: {\n    valid: true,\n    payload\n  }\n}];"
+      },
+      "id": "validate-payload",
+      "name": "Validate Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Check validation result\nconst result = $input.first().json;\nif (!result.valid) {\n  return [{\n    json: {\n      status: 'error',\n      error: result.error\n    }\n  }];\n}\nreturn [result];"
+      },
+      "id": "check-validation",
+      "name": "Check Validation",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"error\",\n  \"error\": \"{{ $json.error }}\"\n}",
+        "statusCode": "=400",
+        "options": {}
+      },
+      "id": "error-response",
+      "name": "Error Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [650, 500]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE reviews SET result = :result, summary = :summary, findings = json(:findings), reviewer_id = :reviewer_id, completed_at = CURRENT_TIMESTAMP WHERE id = :review_id AND task_id = :task_id RETURNING *;",
+        "parameters": "={\n  \"result\": $json.payload.result,\n  \"summary\": $json.payload.summary || 'No summary provided',\n  \"findings\": JSON.stringify($json.payload.findings || []),\n  \"reviewer_id\": $json.payload.reviewer_id,\n  \"review_id\": $json.payload.review_id,\n  \"task_id\": $json.payload.task_id\n}"
+      },
+      "id": "update-review",
+      "name": "Update Review Record",
+      "type": "n8n-nodes-base.sqlite",
+      "typeVersion": 1,
+      "position": [850, 300],
+      "credentials": {
+        "sqlite": "sqlite-credentials"
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Route based on review result\nconst payload = $input.first().json.payload;\nconst result = payload.result;\n\n// Get correlation_id from the review record\nconst review = $input.all()[0].json[0];\n\n// Route to different outputs based on result\nconst routes = {\n  approve: 0,\n  reject: 1,\n  blocked: 2\n};\n\nreturn [routes[result]].map(idx => ({\n  json: {\n    route: result,\n    review_id: payload.review_id,\n    task_id: payload.task_id,\n    reviewer_id: payload.reviewer_id,\n    summary: payload.summary,\n    findings: payload.findings || [],\n    correlation_id: review.correlation_id || payload.correlation_id\n  }\n}));"
+      },
+      "id": "route-result",
+      "name": "Route by Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE tasks SET status = 'approved', updated_at = CURRENT_TIMESTAMP WHERE id = :task_id RETURNING *;",
+        "parameters": "={\n  \"task_id\": $json.task_id\n}"
+      },
+      "id": "approve-task",
+      "name": "Approve Task",
+      "type": "n8n-nodes-base.sqlite",
+      "typeVersion": 1,
+      "position": [1250, 150],
+      "credentials": {
+        "sqlite": "sqlite-credentials"
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE tasks SET status = 'review_failed', retry_count = retry_count + 1, updated_at = CURRENT_TIMESTAMP WHERE id = :task_id RETURNING *;",
+        "parameters": "={\n  \"task_id\": $json.task_id\n}"
+      },
+      "id": "reject-task",
+      "name": "Reject Task",
+      "type": "n8n-nodes-base.sqlite",
+      "typeVersion": 1,
+      "position": [1250, 300],
+      "credentials": {
+        "sqlite": "sqlite-credentials"
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE tasks SET status = 'blocked', updated_at = CURRENT_TIMESTAMP WHERE id = :task_id RETURNING *;",
+        "parameters": "={\n  \"task_id\": $json.task_id\n}"
+      },
+      "id": "block-task",
+      "name": "Block Task",
+      "type": "n8n-nodes-base.sqlite",
+      "typeVersion": 1,
+      "position": [1250, 450],
+      "credentials": {
+        "sqlite": "sqlite-credentials"
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Create remediation task for rejections\nreturn [{\n  json: {\n    event: 'remediation_required',\n    original_task_id: $json.task_id,\n    review_id: $json.review_id,\n    reason: $json.summary,\n    channels: ['slack']\n  }\n}];"
+      },
+      "id": "create-remediation",
+      "name": "Create Remediation",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1450, 300]
+    },
+    {
+      "parameters": {
+        "workflowId": "task-create",
+        "options": {}
+      },
+      "id": "trigger-remediation",
+      "name": "Trigger Remediation Task",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [1650, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO audit_events (correlation_id, actor, action, payload) VALUES (:correlation_id, 'symphony', 'review.completed', json(:payload));",
+        "parameters": "={\n  \"correlation_id\": $json.correlation_id,\n  \"payload\": JSON.stringify({\n    review_id: $json.review_id,\n    task_id: $json.task_id,\n    result: $json.route,\n    reviewer_id: $json.reviewer_id,\n    summary: $json.summary\n  })\n}"
+      },
+      "id": "log-audit",
+      "name": "Log Audit Event",
+      "type": "n8n-nodes-base.sqlite",
+      "typeVersion": 1,
+      "position": [1450, 150],
+      "credentials": {
+        "sqlite": "sqlite-credentials"
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"success\",\n  \"review_id\": \"{{ $json.review_id }}\",\n  \"result\": \"{{ $json.route }}\",\n  \"message\": \"Review processed successfully\"\n}",
+        "options": {}
+      },
+      "id": "success-response",
+      "name": "Success Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1850, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prepare notification\nconst route = $json.route;\nconst messages = {\n  approve: `Review approved for task ${$json.task_id}`,\n  reject: `Review rejected for task ${$json.task_id} - remediation required`,\n  blocked: `Task ${$json.task_id} blocked pending review`\n};\n\nreturn [{\n  json: {\n    event: 'review_completed',\n    route: route,\n    task_id: $json.task_id,\n    review_id: $json.review_id,\n    message: messages[route],\n    channels: ['slack', 'webhook']\n  }\n}];"
+      },
+      "id": "prepare-notification",
+      "name": "Prepare Notification",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1450, 450]
+    },
+    {
+      "parameters": {
+        "workflowId": "notification-send",
+        "options": {}
+      },
+      "id": "trigger-notification",
+      "name": "Trigger Notification",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [1650, 450]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Error handler\nconst error = $input.first().json;\nreturn [{\n  json: {\n    event: 'review_report_failed',\n    error: error.message || 'Unknown error',\n    timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "error-handler",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [850, 600]
+    },
+    {
+      "parameters": {
+        "workflowId": "audit-append",
+        "options": {}
+      },
+      "id": "log-error-audit",
+      "name": "Log Error to Audit",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [1050, 600]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "openclaw",
+      "id": "tag-openclaw",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Validate Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Payload": {
+      "main": [
+        [
+          {
+            "node": "Check Validation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Validation": {
+      "main": [
+        [
+          {
+            "node": "Update Review Record",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Review Record": {
+      "main": [
+        [
+          {
+            "node": "Route by Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Result": {
+      "main": [
+        [
+          {
+            "node": "Approve Task",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reject Task",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Block Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approve Task": {
+      "main": [
+        [
+          {
+            "node": "Log Audit Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reject Task": {
+      "main": [
+        [
+          {
+            "node": "Create Remediation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Remediation": {
+      "main": [
+        [
+          {
+            "node": "Trigger Remediation Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger Remediation Task": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Block Task": {
+      "main": [
+        [
+          {
+            "node": "Prepare Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Audit Event": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Notification": {
+      "main": [
+        [
+          {
+            "node": "Trigger Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger Notification": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Review Record:onError": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Handler": {
+      "main": [
+        [
+          {
+            "node": "Log Error to Audit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

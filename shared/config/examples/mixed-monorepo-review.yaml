@@ -1,0 +1,86 @@
+# Mixed Monorepo Review Configuration
+# Example for a monorepo with multiple languages (Node.js, Python, Rust)
+# Place this file at: .openclaw/review.yaml
+
+repo:
+  language: mixed
+  profile_default: STANDARD
+
+# Workspace definitions for each package in the monorepo
+workspaces:
+  frontend:
+    path: "apps/frontend"
+    language: node
+    commands:
+      test: ["npm test"]
+      lint: ["npm run lint"]
+      typecheck: ["npx tsc --noEmit"]
+      format: ["npx prettier --check ."]
+      build: ["npm run build"]
+      security: ["npm audit"]
+  
+  backend:
+    path: "apps/backend"
+    language: python
+    commands:
+      test: ["pytest"]
+      lint: ["ruff check ."]
+      typecheck: ["mypy ."]
+      format: ["black --check ."]
+      security: ["pip-audit -r requirements.txt"]
+  
+  shared:
+    path: "libs/shared"
+    language: rust
+    commands:
+      test: ["cargo test"]
+      lint: ["cargo clippy -- -D warnings"]
+      format: ["cargo fmt --check"]
+      build: ["cargo build"]
+      security: ["cargo audit"]
+
+# Global commands run at the root level
+commands:
+  test: []
+  lint: []
+  typecheck: []
+  format: []
+  build: []
+
+# Security configuration
+security:
+  dependency_scan:
+    - "npm audit"
+    - "pip-audit -r requirements.txt"
+    - "cargo audit"
+  
+  secret_scan:
+    - "gitleaks detect --verbose"
+  
+  sast_scan:
+    - "bandit -r apps/backend -f json"
+    - "semgrep --config=auto --json"
+
+# Review policy
+policy:
+  allow_warn_merge: false
+  fail_on_warn_over: 10
+  require_approval: true
+  max_review_time_minutes: 30
+
+# Monorepo-specific settings
+monorepo:
+  # Enable selective testing (only test changed workspaces)
+  selective_testing: true
+  
+  # Include shared libraries when their dependents change
+  include_dependents: true
+  
+  # Run workspaces in parallel
+  parallel_execution: true
+  
+  # Define workspace dependencies (for selective testing)
+  dependencies:
+    frontend: ["shared"]
+    backend: ["shared"]
+    shared: []

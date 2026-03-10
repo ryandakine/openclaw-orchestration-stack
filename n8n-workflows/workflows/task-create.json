@@ -1,0 +1,246 @@
+{
+  "name": "Task Create",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "task/create",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "task-create"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Validate task payload\nconst payload = $input.first().json.body || $input.first().json;\n\nconst required = ['intent', 'correlation_id', 'idempotency_key'];\nconst missing = required.filter(f => !payload[f]);\n\nif (missing.length > 0) {\n  return [{\n    json: {\n      valid: false,\n      error: `Missing required fields: ${missing.join(', ')}`,\n      payload\n    }\n  }];\n}\n\n// Validate intent is valid\nconst validIntents = ['PR_FIX', 'CODE_CHANGE', 'FILE_TASK', 'DB_READ', 'DB_UPDATE', 'NOTIFY', 'CMS_EDIT'];\nif (!validIntents.includes(payload.intent)) {\n  return [{\n    json: {\n      valid: false,\n      error: `Invalid intent: ${payload.intent}. Must be one of: ${validIntents.join(', ')}`,\n      payload\n    }\n  }];\n}\n\nreturn [{\n  json: {\n    valid: true,\n    payload\n  }\n}];"
+      },
+      "id": "validate-payload",
+      "name": "Validate Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Check validation result\nconst result = $input.first().json;\nif (!result.valid) {\n  return [{\n    json: {\n      status: 'error',\n      error: result.error,\n      correlation_id: result.payload?.correlation_id\n    }\n  }];\n}\nreturn [result];"
+      },
+      "id": "check-validation",
+      "name": "Check Validation",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"error\",\n  \"error\": \"{{ $json.error }}\"\n}",
+        "statusCode": "=400",
+        "options": {}
+      },
+      "id": "error-response",
+      "name": "Error Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [650, 500]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO tasks (id, correlation_id, idempotency_key, status, assigned_to, intent, payload, requested_by, source) VALUES (lower(hex(randomblob(16))), :correlation_id, :idempotency_key, 'queued', :assigned_to, :intent, json(:payload), :requested_by, :source) ON CONFLICT(idempotency_key) DO UPDATE SET updated_at = CURRENT_TIMESTAMP WHERE idempotency_key = :idempotency_key RETURNING *;",
+        "parameters": "={\n  \"correlation_id\": $json.payload.correlation_id,\n  \"idempotency_key\": $json.payload.idempotency_key,\n  \"assigned_to\": $json.payload.assigned_to || 'DEVCLAW',\n  \"intent\": $json.payload.intent,\n  \"payload\": JSON.stringify($json.payload.payload || {}),\n  \"requested_by\": $json.payload.requested_by || 'api',\n  \"source\": $json.payload.source || 'api'\n}"
+      },
+      "id": "insert-task",
+      "name": "Insert Task to DB",
+      "type": "n8n-nodes-base.sqlite",
+      "typeVersion": 1,
+      "position": [850, 300],
+      "credentials": {
+        "sqlite": "sqlite-credentials"
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO audit_events (correlation_id, actor, action, payload) VALUES (:correlation_id, 'n8n', 'task.created', json(:payload));",
+        "parameters": "={\n  \"correlation_id\": $json[0].correlation_id,\n  \"payload\": JSON.stringify({\n    task_id: $json[0].id,\n    intent: $json[0].intent,\n    assigned_to: $json[0].assigned_to,\n    source: $json[0].source\n  })\n}"
+      },
+      "id": "log-audit",
+      "name": "Log Audit Event",
+      "type": "n8n-nodes-base.sqlite",
+      "typeVersion": 1,
+      "position": [1050, 200],
+      "credentials": {
+        "sqlite": "sqlite-credentials"
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"success\",\n  \"task\": {{ JSON.stringify($json[0]) }}\n}",
+        "statusCode": "=201",
+        "options": {}
+      },
+      "id": "success-response",
+      "name": "Success Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1250, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Trigger notification workflow\nreturn [{\n  json: {\n    event: 'task_created',\n    task: $json[0],\n    channels: ['slack', 'webhook']\n  }\n}];"
+      },
+      "id": "prepare-notification",
+      "name": "Prepare Notification",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1050, 400]
+    },
+    {
+      "parameters": {
+        "workflowId": "notification-send",
+        "options": {}
+      },
+      "id": "trigger-notification",
+      "name": "Trigger Notification",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [1250, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Error handler\nconst error = $input.first().json;\nreturn [{\n  json: {\n    event: 'task_create_failed',\n    error: error.message || 'Unknown error',\n    timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "error-handler",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [850, 600]
+    },
+    {
+      "parameters": {
+        "workflowId": "audit-append",
+        "options": {}
+      },
+      "id": "log-error-audit",
+      "name": "Log Error to Audit",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [1050, 600]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "openclaw",
+      "id": "tag-openclaw",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Validate Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Payload": {
+      "main": [
+        [
+          {
+            "node": "Check Validation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Validation": {
+      "main": [
+        [
+          {
+            "node": "Insert Task to DB",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Task to DB": {
+      "main": [
+        [
+          {
+            "node": "Log Audit Event",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Prepare Notification",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Notification": {
+      "main": [
+        [
+          {
+            "node": "Trigger Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Task to DB:onError": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Handler": {
+      "main": [
+        [
+          {
+            "node": "Log Error to Audit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

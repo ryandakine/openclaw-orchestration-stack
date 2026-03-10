@@ -1,0 +1,54 @@
+# Python Project Review Configuration
+# Place this file at: .openclaw/review.yaml
+
+repo:
+  language: python
+  profile_default: STANDARD
+
+commands:
+  test:
+    - "pytest -q --tb=short"
+    - "pytest tests/integration -q --tb=short"
+  
+  lint:
+    - "ruff check ."
+    - "ruff check --select E,W,F,I,N,D ."
+  
+  typecheck:
+    - "mypy . --ignore-missing-imports"
+  
+  format:
+    - "black --check ."
+    - "ruff format --check ."
+  
+  build:
+    - "python -m build --wheel"
+
+security:
+  dependency_scan:
+    - "pip-audit -r requirements.txt"
+    - "pip-audit --desc"
+  
+  secret_scan:
+    - "gitleaks detect --verbose"
+  
+  sast_scan:
+    - "bandit -r src -f json"
+    - "semgrep --config=auto --json"
+
+policy:
+  allow_warn_merge: false
+  fail_on_warn_over: 10
+  require_approval: true
+  max_review_time_minutes: 30
+
+# Python-specific configuration
+python:
+  min_coverage_percent: 80
+  require_type_hints: true
+  check_docstrings: true
+  ignore_patterns:
+    - "*/tests/*"
+    - "*/migrations/*"
+    - "*/venv/*"
+    - "*/__pycache__/*"

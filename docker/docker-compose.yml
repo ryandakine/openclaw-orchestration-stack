@@ -1,0 +1,250 @@
+# OpenClaw Orchestration Stack - Docker Compose
+# Development and production deployment configuration
+
+version: '3.8'
+
+services:
+  # ============================================================================
+  # OpenClaw API Server
+  # ============================================================================
+  api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: production
+    image: openclaw/api:latest
+    container_name: openclaw-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - DEBUG=${DEBUG:-false}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - OPENCLAW_API_KEY=${OPENCLAW_API_KEY}
+      - OPENCLAW_DB_PATH=/app/data/openclaw.db
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GITHUB_API_KEY=${GITHUB_API_KEY}
+      - GITHUB_WEBHOOK_SECRET=${GITHUB_WEBHOOK_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-*}
+      - MAX_WORKERS=${MAX_WORKERS:-5}
+      - TASK_TIMEOUT=${TASK_TIMEOUT:-300}
+      - LEASE_DURATION=${LEASE_DURATION:-300}
+    volumes:
+      - api-data:/app/data
+      - api-logs:/app/logs
+      - ./config:/app/config:ro
+    networks:
+      - openclaw-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+  # ============================================================================
+  # DevClaw Worker
+  # ============================================================================
+  worker:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: worker
+    image: openclaw/worker:latest
+    container_name: openclaw-worker
+    restart: unless-stopped
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - DEBUG=${DEBUG:-false}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - OPENCLAW_DB_PATH=/app/data/openclaw.db
+      - WORKER_ID=worker-${HOSTNAME}
+      - MAX_CONCURRENT=${MAX_CONCURRENT:-3}
+      - POLL_INTERVAL=${POLL_INTERVAL:-5}
+      - WORK_DIR=/tmp/devclaw
+    volumes:
+      - api-data:/app/data:ro
+      - worker-work:/tmp/devclaw
+      - /var/run/docker.sock:/var/run/docker.sock  # For Docker-in-Docker
+    networks:
+      - openclaw-network
+    depends_on:
+      api:
+        condition: service_healthy
+    deploy:
+      replicas: ${WORKER_REPLICAS:-2}
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 4G
+        reservations:
+          cpus: '1.0'
+          memory: 1G
+
+  # ============================================================================
+  # Symphony Bridge
+  # ============================================================================
+  symphony:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: production
+    image: openclaw/symphony:latest
+    container_name: openclaw-symphony
+    restart: unless-stopped
+    command: ["python", "-m", "symphony_bridge.src.webhook_handler"]
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - DEBUG=${DEBUG:-false}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - OPENCLAW_DB_PATH=/app/data/openclaw.db
+      - GITHUB_API_KEY=${GITHUB_API_KEY}
+      - GITHUB_WEBHOOK_SECRET=${GITHUB_WEBHOOK_SECRET}
+      - WEBHOOK_PORT=8080
+    ports:
+      - "8080:8080"
+    volumes:
+      - api-data:/app/data:ro
+    networks:
+      - openclaw-network
+    depends_on:
+      api:
+        condition: service_healthy
+
+  # ============================================================================
+  # n8n Workflow Engine
+  # ============================================================================
+  n8n:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: n8n
+    image: openclaw/n8n:latest
+    container_name: openclaw-n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=${N8N_BASIC_AUTH_ACTIVE:-true}
+      - N8N_BASIC_AUTH_USER=${N8N_BASIC_AUTH_USER:-admin}
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_BASIC_AUTH_PASSWORD}
+      - N8N_HOST=${N8N_HOST:-localhost}
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=${N8N_PROTOCOL:-http}
+      - N8N_USER_FOLDER=/home/n8n/.n8n
+      - WEBHOOK_URL=${WEBHOOK_URL:-http://localhost:5678}
+      - DB_TYPE=sqlite
+      - DB_SQLITE_PATH=/home/n8n/.n8n/database.sqlite
+    volumes:
+      - n8n-data:/home/n8n/.n8n
+    networks:
+      - openclaw-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5678/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # ============================================================================
+  # Database Backup (optional)
+  # ============================================================================
+  backup:
+    image: offen/docker-volume-backup:latest
+    container_name: openclaw-backup
+    restart: unless-stopped
+    environment:
+      - BACKUP_CRON_EXPRESSION=0 2 * * *
+      - BACKUP_RETENTION_DAYS=30
+      - BACKUP_FILENAME=backup-%Y%m%d-%H%M%S.tar.gz
+      - BACKUP_ARCHIVE=/archive
+      - BACKUP_STOP_CONTAINER_LABEL=openclaw.stop-during-backup
+      - AWS_S3_BUCKET_NAME=${BACKUP_S3_BUCKET}
+      - AWS_ACCESS_KEY_ID=${BACKUP_AWS_ACCESS_KEY}
+      - AWS_SECRET_ACCESS_KEY=${BACKUP_AWS_SECRET_KEY}
+      - AWS_DEFAULT_REGION=${BACKUP_AWS_REGION:-us-east-1}
+    volumes:
+      - api-data:/backup/data:ro
+      - n8n-data:/backup/n8n:ro
+      - ./backups:/archive
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - openclaw-network
+    profiles:
+      - backup
+
+  # ============================================================================
+  # Monitoring - Prometheus (optional)
+  # ============================================================================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: openclaw-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    networks:
+      - openclaw-network
+    profiles:
+      - monitoring
+
+  # ============================================================================
+  # Monitoring - Grafana (optional)
+  # ============================================================================
+  grafana:
+    image: grafana/grafana:latest
+    container_name: openclaw-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./config/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./config/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    networks:
+      - openclaw-network
+    profiles:
+      - monitoring
+
+# ============================================================================
+# Networks
+# ============================================================================
+networks:
+  openclaw-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# ============================================================================
+# Volumes
+# ============================================================================
+volumes:
+  api-data:
+    driver: local
+  api-logs:
+    driver: local
+  worker-work:
+    driver: local
+  n8n-data:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local

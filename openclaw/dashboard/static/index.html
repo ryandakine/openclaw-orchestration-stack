@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw Observability Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔍 OpenClaw Observability Dashboard</h1>
+            <div class="header-controls">
+                <button id="themeToggle" class="btn btn-secondary">☀️ Light</button>
+                <button id="refreshBtn" class="btn btn-primary">🔄 Refresh</button>
+            </div>
+        </header>
+        
+        <div class="status-bar">
+            <span id="statusIndicator" class="status-badge status-unknown">Checking...</span>
+            <span id="lastUpdate">Last updated: Never</span>
+            <span id="autoRefresh">Auto-refresh: ON (10s)</span>
+        </div>
+        
+        <!-- Alerts Panel -->
+        <section id="alertsSection" class="alerts-panel hidden">
+            <h2>🚨 Active Alerts</h2>
+            <div id="alertsList" class="alerts-list"></div>
+        </section>
+        
+        <!-- Metrics Grid -->
+        <div class="metrics-grid">
+            <!-- Queue Depth Gauge -->
+            <div class="card">
+                <h3>📊 Queue Depth</h3>
+                <div class="gauge-container">
+                    <canvas id="queueDepthChart"></canvas>
+                </div>
+                <div id="queueDepthStats" class="stats"></div>
+            </div>
+            
+            <!-- Task Status Pie Chart -->
+            <div class="card">
+                <h3>📈 Task Status Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="statusPieChart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Cycle Time Trend -->
+            <div class="card wide">
+                <h3>⏱️ Cycle Time Trends</h3>
+                <div class="chart-container">
+                    <canvas id="cycleTimeChart"></canvas>
+                </div>
+                <div id="cycleTimeStats" class="stats"></div>
+            </div>
+            
+            <!-- Stuck Tasks Alert Panel -->
+            <div class="card wide" id="stuckTasksCard">
+                <h3>⚠️ Stuck Tasks</h3>
+                <div id="stuckTasksList" class="stuck-tasks-list">
+                    <p class="empty">No stuck tasks detected</p>
+                </div>
+            </div>
+            
+            <!-- Review Metrics -->
+            <div class="card">
+                <h3>✅ Review Pass/Fail</h3>
+                <div class="chart-container">
+                    <canvas id="reviewChart"></canvas>
+                </div>
+                <div id="reviewStats" class="stats"></div>
+            </div>
+            
+            <!-- System Health -->
+            <div class="card">
+                <h3>🏥 System Health</h3>
+                <div id="healthStatus" class="health-status">
+                    <div class="health-indicator health-unknown">Unknown</div>
+                </div>
+                <div id="healthStats" class="stats"></div>
+            </div>
+            
+            <!-- Retry Rate -->
+            <div class="card">
+                <h3>🔄 Retry Rate</h3>
+                <div id="retryRateStats" class="stats"></div>
+            </div>
+            
+            <!-- Dead Letter Queue -->
+            <div class="card">
+                <h3>💀 Dead Letter Queue</h3>
+                <div id="dlqStats" class="stats"></div>
+            </div>
+        </div>
+        
+        <!-- Recent Audit Events -->
+        <section class="card wide">
+            <h3>📋 Recent Audit Events</h3>
+            <div class="table-container">
+                <table id="auditTable">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Actor</th>
+                            <th>Action</th>
+                            <th>Correlation ID</th>
+                        </tr>
+                    </thead>
+                    <tbody id="auditTableBody">
+                        <tr><td colspan="4" class="empty">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        
+        <footer>
+            <p>OpenClaw Observability Dashboard v1.0.0 | 
+               <a href="/api/metrics">API</a> | 
+               <a href="/api/health">Health</a></p>
+        </footer>
+    </div>
+    
+    <script src="dashboard.js"></script>
+    <script>
+        // Initialize configuration
+        window.DASHBOARD_CONFIG = {
+            refreshInterval: 10,
+            title: "OpenClaw Observability Dashboard"
+        };
+    </script>
+</body>
+</html>

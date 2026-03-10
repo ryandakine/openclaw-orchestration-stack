@@ -1,0 +1,199 @@
+# OpenClaw Routing Configuration
+# 
+# This file configures how requests are routed between DEVCLAW and SYMPHONY workers.
+# Modify these settings to adjust routing behavior.
+
+routing:
+  # Default worker when intent is unclear
+  default_worker: "DEVCLAW"
+  
+  # Minimum confidence required for automatic routing
+  # Below this threshold, requests may be rejected or require clarification
+  confidence_threshold: 0.7
+  
+  # Confidence threshold for skipping automatic review
+  # Plans with confidence >= this value skip SYMPHONY review (unless other rules apply)
+  auto_review_threshold: 0.9
+  
+  # Maximum retry attempts for failed tasks
+  max_retries: 3
+  
+  # Intent to worker routing mapping
+  # Determines which worker handles each intent category
+  intent_routing:
+    feature_request: "DEVCLAW"    # New features go to DEVCLAW
+    bug_report: "DEVCLAW"         # Bug fixes go to DEVCLAW
+    code_improvement: "DEVCLAW"   # Refactoring goes to DEVCLAW
+    review: "SYMPHONY"            # Reviews go to SYMPHONY
+    deployment: "SYMPHONY"        # Deployments go to SYMPHONY
+    question: "DEVCLAW"           # Questions go to DEVCLAW
+    unknown: "DEVCLAW"            # Unknown intents default to DEVCLAW
+  
+  # Action type to worker routing overrides
+  # These take precedence over intent routing
+  action_routing:
+    human_review: "SYMPHONY"      # Human review always goes to SYMPHONY
+    deployment: "SYMPHONY"        # Deployment always goes to SYMPHONY
+
+# Security settings
+security:
+  # Keywords that trigger automatic review regardless of confidence
+  security_keywords:
+    - "auth"
+    - "authentication"
+    - "authorize"
+    - "password"
+    - "credential"
+    - "secret"
+    - "token"
+    - "jwt"
+    - "oauth"
+    - "login"
+    - "logout"
+    - "permission"
+    - "role"
+    - "admin"
+    - "encrypt"
+    - "decrypt"
+    - "hash"
+    - "firewall"
+    - "ssl"
+    - "tls"
+    - "certificate"
+    - "vulnerability"
+    - "injection"
+    - "xss"
+    - "csrf"
+  
+  # Deployment-related keywords
+  deployment_keywords:
+    - "deploy"
+    - "deployment"
+    - "release"
+    - "production"
+    - "prod"
+    - "publish"
+    - "ship"
+    - "launch"
+    - "go live"
+    - "rollout"
+  
+  # Destructive operation keywords
+  destructive_keywords:
+    - "delete"
+    - "drop"
+    - "remove"
+    - "destroy"
+    - "purge"
+    - "truncate"
+    - "wipe"
+
+# Priority settings
+priority:
+  # Base priority levels
+  default_priority: 5
+  
+  # Priority adjustments
+  adjustments:
+    bug_report: 2           # Bugs get +2 priority
+    security_concern: 3     # Security issues get +3 priority
+    urgent_keyword: 2       # Urgent keywords get +2 priority
+  
+  # Urgent keywords that boost priority
+  urgent_keywords:
+    - "urgent"
+    - "critical"
+    - "blocking"
+    - "asap"
+    - "emergency"
+    - "p0"
+    - "p1"
+
+# Action type mappings
+# Maps intent categories to default action types
+action_mappings:
+  feature_request:
+    - "code_generation"
+    - "documentation"
+  
+  bug_report:
+    - "bug_fix"
+    - "test_generation"
+  
+  code_improvement:
+    - "analysis"
+    - "refactoring"
+  
+  review:
+    - "code_review"
+    - "human_review"
+  
+  deployment:
+    - "deployment"
+    - "human_review"
+  
+  question:
+    - "analysis"
+    - "documentation"
+  
+  unknown:
+    - "analysis"
+
+# Confidence calculation settings
+confidence:
+  # Base weights for different signals
+  keyword_match_weight: 0.1      # Each keyword match adds this much
+  pattern_match_weight: 0.3      # Each pattern match adds this much
+  explicit_type_weight: 0.5      # Explicit type field adds this much
+  event_type_weight: 0.2         # Event type match adds this much
+  
+  # Description length adjustments
+  long_description_bonus: 0.05   # Bonus for detailed descriptions (>100 chars)
+  short_description_penalty: 0.1 # Penalty for very short descriptions (<20 chars)
+  unknown_intent_penalty: 0.3    # Penalty for unknown intent
+  
+  # Minimum confidence for clear signals
+  clear_signal_minimum: 0.8      # Confidence floor when score > 1.5
+
+# Webhook endpoints for workers
+# Uncomment and configure to enable webhook emission
+# webhooks:
+#   devclaw: "https://devclaw.internal/webhook"
+#   symphony: "https://symphony.internal/webhook"
+
+# Audit settings
+audit:
+  # Backend: sqlite, console, file, or multi
+  backend: "sqlite"
+  
+  # Log file path (for file backend)
+  # log_path: "data/audit.log"
+  
+  # Minimum level to log
+  min_level: "info"
+
+# Idempotency settings
+idempotency:
+  # Backend: sqlite, memory, or redis
+  backend: "sqlite"
+  
+  # Default TTL in seconds (24 hours)
+  ttl_seconds: 86400
+  
+  # Key prefix
+  key_prefix: "openclaw"
+
+# Emission settings
+emission:
+  # Backend: webhook, rabbitmq, redis, sqlite_queue, or console
+  backend: "sqlite_queue"
+  
+  # RabbitMQ settings (when using rabbitmq backend)
+  # rabbitmq_url: "amqp://localhost"
+  
+  # Redis settings (when using redis backend)
+  # redis_url: "redis://localhost"
+  
+  # Webhook URLs (when using webhook backend)
+  # devclaw_webhook: "https://devclaw.internal/webhook"
+  # symphony_webhook: "https://symphony.internal/webhook"

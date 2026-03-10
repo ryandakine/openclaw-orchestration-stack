@@ -1,0 +1,26 @@
+# Node.js/TypeScript Project Review Configuration
+# Place this file at: .openclaw/review.yaml
+
+repo:
+  language: node
+  profile_default: STANDARD
+
+commands:
+  test:
+    - "npm test"
+  lint:
+    - "npm run lint"
+  typecheck:
+    - "npx tsc --noEmit"
+  
+security:
+  dependency_scan:
+    - "npm audit --audit-level=high"
+  secret_scan:
+    - "gitleaks detect"
+
+policy:
+  allow_warn_merge: false
+  fail_on_warn_over: 10
+  require_approval: true
+  max_review_time_minutes: 30

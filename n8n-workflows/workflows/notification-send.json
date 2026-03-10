@@ -1,0 +1,391 @@
+{
+  "name": "Notification Send",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "notification/send",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "notification-send"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Validate notification payload\nconst payload = $input.first().json.body || $input.first().json;\n\nconst required = ['event', 'message'];\nconst missing = required.filter(f => !payload[f]);\n\nif (missing.length > 0) {\n  return [{\n    json: {\n      valid: false,\n      error: `Missing required fields: ${missing.join(', ')}`,\n      payload\n    }\n  }];\n}\n\n// Validate channels if provided\nconst validChannels = ['slack', 'discord', 'email', 'webhook'];\nconst channels = payload.channels || ['slack'];\nconst invalidChannels = channels.filter(c => !validChannels.includes(c));\n\nif (invalidChannels.length > 0) {\n  return [{\n    json: {\n      valid: false,\n      error: `Invalid channels: ${invalidChannels.join(', ')}. Must be one of: ${validChannels.join(', ')}`,\n      payload\n    }\n  }];\n}\n\nreturn [{\n  json: {\n    valid: true,\n    payload: {\n      ...payload,\n      channels\n    }\n  }\n}];"
+      },
+      "id": "validate-payload",
+      "name": "Validate Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Check validation result\nconst result = $input.first().json;\nif (!result.valid) {\n  return [{\n    json: {\n      status: 'error',\n      error: result.error\n    }\n  }];\n}\nreturn [result];"
+      },
+      "id": "check-validation",
+      "name": "Check Validation",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"error\",\n  \"error\": \"{{ $json.error }}\"\n}",
+        "statusCode": "=400",
+        "options": {}
+      },
+      "id": "error-response",
+      "name": "Error Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [650, 500]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Split by channel for parallel processing\nconst payload = $input.first().json.payload;\nconst channels = payload.channels || ['slack'];\n\n// Return array of items, one per channel\nreturn channels.map(channel => ({\n  json: {\n    channel,\n    event: payload.event,\n    message: payload.message,\n    task: payload.task,\n    review: payload.review,\n    correlation_id: payload.correlation_id\n  }\n}));"
+      },
+      "id": "split-channels",
+      "name": "Split by Channel",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Route to specific channel handler based on channel type\nconst item = $input.first().json;\nconst channel = item.channel;\n\n// Map channel to output index\nconst channelMap = {\n  slack: 0,\n  discord: 1,\n  email: 2,\n  webhook: 3\n};\n\nconst outputIndex = channelMap[channel];\nif (outputIndex === undefined) {\n  return []; // Unknown channel, drop it\n}\n\n// Return on the appropriate output\nconst outputs = [[], [], [], []];\noutputs[outputIndex] = [item];\nreturn outputs;"
+      },
+      "id": "route-channel",
+      "name": "Route by Channel",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "channel": "={{ $json.channel }}",
+        "text": "={{ $json.message }}",
+        "attachments": [],
+        "otherOptions": {}
+      },
+      "id": "slack-send",
+      "name": "Send Slack Message",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [1250, 150],
+      "credentials": {
+        "slackApi": "slack-credentials"
+      }
+    },
+    {
+      "parameters": {
+        "content": "={{ $json.message }}",
+        "options": {}
+      },
+      "id": "discord-send",
+      "name": "Send Discord Message",
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [1250, 300],
+      "credentials": {
+        "discordWebhook": "discord-credentials"
+      }
+    },
+    {
+      "parameters": {
+        "toEmail": "={{ $json.email || 'admin@openclaw.local' }}",
+        "subject": "={{ 'OpenClaw: ' + $json.event }}",
+        "text": "={{ $json.message }}",
+        "options": {}
+      },
+      "id": "email-send",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [1250, 450],
+      "credentials": {
+        "smtp": "smtp-credentials"
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.webhook_url || 'http://localhost:3000/webhook/notifications' }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "event",
+              "value": "={{ $json.event }}"
+            },
+            {
+              "name": "message",
+              "value": "={{ $json.message }}"
+            },
+            {
+              "name": "correlation_id",
+              "value": "={{ $json.correlation_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "webhook-send",
+      "name": "Send Webhook",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1250, 600]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Aggregate results from all channels\nconst allResults = $input.all();\nconst success = allResults.every(r => !r.json.error);\n\nreturn [{\n  json: {\n    status: success ? 'success' : 'partial',\n    channels_sent: allResults.length,\n    results: allResults.map(r => ({\n      channel: r.json.channel,\n      success: !r.json.error,\n      error: r.json.error || null\n    }))\n  }\n}];"
+      },
+      "id": "aggregate-results",
+      "name": "Aggregate Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1450, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "success-response",
+      "name": "Success Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1650, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO audit_events (correlation_id, actor, action, payload) VALUES (:correlation_id, 'n8n', 'notification.sent', json(:payload));",
+        "parameters": "={\n  \"correlation_id\": $json.correlation_id || 'unknown',\n  \"payload\": JSON.stringify({\n    event: $json.event,\n    message: $json.message,\n    channels: $json.channels,\n    timestamp: new Date().toISOString()\n  })\n}"
+      },
+      "id": "log-audit",
+      "name": "Log Audit Event",
+      "type": "n8n-nodes-base.sqlite",
+      "typeVersion": 1,
+      "position": [1450, 500],
+      "credentials": {
+        "sqlite": "sqlite-credentials"
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Error handler\nconst error = $input.first().json;\nreturn [{\n  json: {\n    event: 'notification_failed',\n    error: error.message || 'Unknown error',\n    timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "error-handler",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [850, 700]
+    },
+    {
+      "parameters": {
+        "workflowId": "audit-append",
+        "options": {}
+      },
+      "id": "log-error-audit",
+      "name": "Log Error to Audit",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [1050, 700]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "openclaw",
+      "id": "tag-openclaw",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "name": "notification",
+      "id": "tag-notification",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Validate Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Payload": {
+      "main": [
+        [
+          {
+            "node": "Check Validation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Validation": {
+      "main": [
+        [
+          {
+            "node": "Split by Channel",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split by Channel": {
+      "main": [
+        [
+          {
+            "node": "Route by Channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Channel": {
+      "main": [
+        [
+          {
+            "node": "Send Slack Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Discord Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Slack Message": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Discord Message": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Webhook": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Results": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Log Audit Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split by Channel:onError": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Handler": {
+      "main": [
+        [
+          {
+            "node": "Log Error to Audit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

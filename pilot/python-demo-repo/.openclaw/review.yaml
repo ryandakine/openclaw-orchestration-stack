@@ -1,0 +1,39 @@
+# Python Project Review Configuration
+# Place this file at: .openclaw/review.yaml
+#
+# This configuration is used by OpenClaw to validate Python code
+# and ensure code quality standards are met before merging.
+
+repo:
+  language: python
+  profile_default: STANDARD
+
+commands:
+  test:
+    - "pytest -q"
+  lint:
+    - "ruff check ."
+    - "black --check ."
+  typecheck:
+    - "mypy ."
+
+security:
+  dependency_scan:
+    - "pip-audit -r requirements.txt"
+
+policy:
+  allow_warn_merge: false
+  fail_on_warn_over: 10
+  require_approval: true
+  max_review_time_minutes: 30
+
+# Python-specific configuration
+python:
+  min_coverage_percent: 80
+  require_type_hints: true
+  check_docstrings: true
+  ignore_patterns:
+    - "*/tests/*"
+    - "*/migrations/*"
+    - "*/venv/*"
+    - "*/__pycache__/*"

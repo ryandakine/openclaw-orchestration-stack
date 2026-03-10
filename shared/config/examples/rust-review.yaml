@@ -1,0 +1,57 @@
+# Rust Project Review Configuration
+# Place this file at: .openclaw/review.yaml
+
+repo:
+  language: rust
+  profile_default: STRICT
+
+commands:
+  test:
+    - "cargo test --all-features"
+    - "cargo test --doc"
+  
+  lint:
+    - "cargo clippy --all-targets --all-features -- -D warnings"
+    - "cargo clippy -- -W clippy::pedantic"
+  
+  typecheck:
+    # Rust is compiled, type checking happens during build
+    - "cargo check --all-targets --all-features"
+  
+  format:
+    - "cargo fmt --check"
+  
+  build:
+    - "cargo build --release"
+    - "cargo doc --no-deps"
+
+security:
+  dependency_scan:
+    - "cargo audit"
+    - "cargo deny check"
+  
+  secret_scan:
+    - "gitleaks detect --verbose"
+  
+  sast_scan:
+    - "cargo geiger"
+    - "cargo outdated"
+
+policy:
+  allow_warn_merge: false
+  fail_on_warn_over: 0  # Strict: fail on any warning
+  require_approval: true
+  max_review_time_minutes: 45
+
+# Rust-specific configuration
+rust:
+  edition: "2021"
+  check_unsafe: true
+  require_tests_for_unsafe: true
+  forbid_unsafe: false
+  msrv: "1.70.0"  # Minimum Supported Rust Version
+  features:
+    - "default"
+    - "full"
+  targets:
+    - "x86_64-unknown-linux-gnu"

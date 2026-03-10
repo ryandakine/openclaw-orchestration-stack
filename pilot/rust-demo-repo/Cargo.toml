@@ -1,0 +1,22 @@
+[package]
+name = "rust-demo-repo"
+version = "0.1.0"
+edition = "2021"
+authors = ["OpenClaw Team <team@openclaw.io>"]
+description = "Demo Rust project for OpenClaw orchestration stack"
+license = "MIT"
+repository = "https://github.com/openclaw/rust-demo-repo"
+rust-version = "1.70"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "1.0"
+
+[dev-dependencies]
+tokio-test = "0.4"
+
+[profile.release]
+opt-level = 3
+lto = true
+strip = true

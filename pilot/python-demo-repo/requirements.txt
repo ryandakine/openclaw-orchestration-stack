@@ -1,0 +1,28 @@
+# Calculator Package Dependencies
+# This file lists all dependencies required for the calculator demo project
+
+# Testing framework
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
+pytest-cov>=4.0.0
+
+# Code quality tools
+ruff>=0.1.0
+black>=23.0.0
+mypy>=1.5.0
+
+# Security scanning
+pip-audit>=2.6.0
+bandit>=1.7.5
+
+# Type checking
+mypy-extensions>=1.0.0
+typing-extensions>=4.7.0
+
+# Documentation
+sphinx>=7.0.0
+
+# Build tools
+build>=0.10.0
+setuptools>=68.0.0
+wheel>=0.41.0

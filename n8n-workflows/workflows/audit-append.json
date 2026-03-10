@@ -1,0 +1,256 @@
+{
+  "name": "Audit Append",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "audit/append",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "audit-append"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Validate audit event payload\nconst payload = $input.first().json.body || $input.first().json;\n\nconst required = ['correlation_id', 'actor', 'action'];\nconst missing = required.filter(f => !payload[f]);\n\nif (missing.length > 0) {\n  return [{\n    json: {\n      valid: false,\n      error: `Missing required fields: ${missing.join(', ')}`,\n      payload\n    }\n  }];\n}\n\n// Validate actor is valid\nconst validActors = ['openclaw', 'devclaw', 'symphony', 'n8n', 'system', 'user'];\nif (!validActors.includes(payload.actor)) {\n  return [{\n    json: {\n      valid: false,\n      error: `Invalid actor: ${payload.actor}. Must be one of: ${validActors.join(', ')}`,\n      payload\n    }\n  }];\n}\n\nreturn [{\n  json: {\n    valid: true,\n    payload\n  }\n}];"
+      },
+      "id": "validate-payload",
+      "name": "Validate Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Check validation result\nconst result = $input.first().json;\nif (!result.valid) {\n  return [{\n    json: {\n      status: 'error',\n      error: result.error\n    }\n  }];\n}\nreturn [result];"
+      },
+      "id": "check-validation",
+      "name": "Check Validation",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"error\",\n  \"error\": \"{{ $json.error }}\"\n}",
+        "statusCode": "=400",
+        "options": {}
+      },
+      "id": "error-response",
+      "name": "Error Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [650, 500]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO audit_events (correlation_id, actor, action, payload, ip_address, user_agent) VALUES (:correlation_id, :actor, :action, json(:payload), :ip_address, :user_agent);",
+        "parameters": "={\n  \"correlation_id\": $json.payload.correlation_id,\n  \"actor\": $json.payload.actor,\n  \"action\": $json.payload.action,\n  \"payload\": JSON.stringify($json.payload.payload || {}),\n  \"ip_address\": $json.payload.ip_address || null,\n  \"user_agent\": $json.payload.user_agent || null\n}"
+      },
+      "id": "insert-audit",
+      "name": "Insert Audit Event",
+      "type": "n8n-nodes-base.sqlite",
+      "typeVersion": 1,
+      "position": [850, 300],
+      "credentials": {
+        "sqlite": "sqlite-credentials"
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"success\",\n  \"message\": \"Audit event recorded\",\n  \"correlation_id\": \"{{ $json.payload.correlation_id }}\",\n  \"action\": \"{{ $json.payload.action }}\"\n}",
+        "statusCode": "=201",
+        "options": {}
+      },
+      "id": "success-response",
+      "name": "Success Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Also write to local file as backup\n// This ensures audit trail survives even if DB is unavailable\nreturn [{\n  json: {\n    event: 'audit_backup',\n    timestamp: new Date().toISOString(),\n    correlation_id: $json.payload.correlation_id,\n    actor: $json.payload.actor,\n    action: $json.payload.action,\n    data: $json.payload\n  }\n}];"
+      },
+      "id": "prepare-backup",
+      "name": "Prepare Backup",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1050, 450]
+    },
+    {
+      "parameters": {
+        "fileName": "=/home/ryan/openclaw-orchestration-stack/n8n-workflows/audit/audit-{{ Date.now() }}.json",
+        "options": {}
+      },
+      "id": "write-backup",
+      "name": "Write Backup File",
+      "type": "n8n-nodes-base.writeBinaryFile",
+      "typeVersion": 1,
+      "position": [1250, 450]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Error handler - try to write to fallback log\nconst error = $input.first().json;\nreturn [{\n  json: {\n    timestamp: new Date().toISOString(),\n    level: 'ERROR',\n    component: 'audit-append',\n    error: error.message || 'Unknown error',\n    fallback: true\n  }\n}];"
+      },
+      "id": "error-handler",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [850, 600]
+    },
+    {
+      "parameters": {
+        "fileName": "=/home/ryan/openclaw-orchestration-stack/n8n-workflows/audit/audit-error-{{ Date.now() }}.json",
+        "options": {}
+      },
+      "id": "write-error-log",
+      "name": "Write Error Log",
+      "type": "n8n-nodes-base.writeBinaryFile",
+      "typeVersion": 1,
+      "position": [1050, 600]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"error\",\n  \"message\": \"Failed to record audit event\",\n  \"error\": \"{{ $json.error }}\"\n}",
+        "statusCode": "=500",
+        "options": {}
+      },
+      "id": "error-webhook-response",
+      "name": "Error Webhook Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1250, 600]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "openclaw",
+      "id": "tag-openclaw",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "name": "audit",
+      "id": "tag-audit",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Validate Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Payload": {
+      "main": [
+        [
+          {
+            "node": "Check Validation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Validation": {
+      "main": [
+        [
+          {
+            "node": "Insert Audit Event",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Audit Event": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Prepare Backup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Backup": {
+      "main": [
+        [
+          {
+            "node": "Write Backup File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Audit Event:onError": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Handler": {
+      "main": [
+        [
+          {
+            "node": "Write Error Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write Error Log": {
+      "main": [
+        [
+          {
+            "node": "Error Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

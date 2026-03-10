@@ -1,0 +1,76 @@
+# OpenClaw Orchestration Stack Systemd Service
+# 
+# Installation:
+#   1. Copy this file to /etc/systemd/system/openclaw.service
+#   2. Edit paths and environment variables
+#   3. Run: systemctl daemon-reload
+#   4. Run: systemctl enable openclaw
+#   5. Run: systemctl start openclaw
+#
+# Logs:
+#   journalctl -u openclaw -f
+
+[Unit]
+Description=OpenClaw Orchestration Stack API Server
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=openclaw
+Group=openclaw
+
+# Working directory
+WorkingDirectory=/opt/openclaw
+
+# Environment variables
+Environment="PATH=/opt/openclaw/venv/bin:/usr/local/bin:/usr/bin:/bin"
+Environment="PYTHONUNBUFFERED=1"
+Environment="PYTHONDONTWRITEBYTECODE=1"
+
+# Load environment from file
+EnvironmentFile=-/etc/openclaw/environment
+
+# Main executable
+ExecStart=/opt/openclaw/venv/bin/uvicorn openclaw.src.api:app \
+    --host 0.0.0.0 \
+    --port 8000 \
+    --workers 4 \
+    --loop uvloop \
+    --http httptools \
+    --proxy-headers
+
+# Restart policy
+Restart=on-failure
+RestartSec=5s
+StartLimitInterval=60s
+StartLimitBurst=3
+
+# Graceful shutdown
+TimeoutStopSec=30s
+KillSignal=SIGTERM
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=4096
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/openclaw/data /opt/openclaw/logs
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictRealtime=true
+RestrictNamespaces=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+
+# Sandboxing
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+
+[Install]
+WantedBy=multi-user.target

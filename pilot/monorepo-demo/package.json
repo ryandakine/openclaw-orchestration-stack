@@ -1,0 +1,22 @@
+{
+  "name": "openclaw-monorepo-demo",
+  "version": "1.0.0",
+  "description": "Mixed-language monorepo demo for OpenClaw",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "test": "echo 'Run tests in individual workspaces'",
+    "test:all": "echo 'Testing all workspaces...' && cd apps/frontend && npm test && cd ../backend && pytest",
+    "lint": "echo 'Linting all workspaces...'",
+    "build": "echo 'Building all workspaces...'"
+  },
+  "keywords": [
+    "monorepo",
+    "openclaw",
+    "demo"
+  ],
+  "author": "OpenClaw Team",
+  "license": "MIT"
+}

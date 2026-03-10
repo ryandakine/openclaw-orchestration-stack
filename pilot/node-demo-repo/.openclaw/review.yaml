@@ -1,0 +1,24 @@
+# OpenClaw Review Configuration for Node Demo
+repo:
+  language: node
+  profile_default: STANDARD
+
+commands:
+  test:
+    - "npm test"
+  lint:
+    - "npm run lint"
+  typecheck:
+    - "npm run typecheck"
+  
+security:
+  dependency_scan:
+    - "npm audit --audit-level=high"
+  secret_scan:
+    - "gitleaks detect"
+
+policy:
+  allow_warn_merge: false
+  fail_on_warn_over: 10
+  require_approval: true
+  max_review_time_minutes: 30

@@ -1,0 +1,55 @@
+# OpenClaw DevClaw Worker Systemd Service
+#
+# Installation:
+#   1. Copy this file to /etc/systemd/system/openclaw-worker.service
+#   2. Run: systemctl daemon-reload
+#   3. Run: systemctl enable openclaw-worker
+#   4. Run: systemctl start openclaw-worker
+
+[Unit]
+Description=OpenClaw DevClaw Worker
+After=network.target openclaw.service
+Wants=network.target
+
+[Service]
+Type=simple
+User=openclaw
+Group=openclaw
+
+WorkingDirectory=/opt/openclaw
+
+Environment="PATH=/opt/openclaw/venv/bin:/usr/local/bin:/usr/bin:/bin"
+Environment="PYTHONUNBUFFERED=1"
+EnvironmentFile=-/etc/openclaw/environment
+
+# Worker-specific environment
+Environment="WORKER_ID=%H"
+Environment="MAX_CONCURRENT=3"
+Environment="POLL_INTERVAL=5"
+Environment="WORK_DIR=/tmp/devclaw"
+
+ExecStart=/opt/openclaw/venv/bin/python -m devclaw_runner.src.worker
+
+Restart=always
+RestartSec=10s
+StartLimitInterval=60s
+StartLimitBurst=5
+
+TimeoutStopSec=30s
+KillSignal=SIGTERM
+
+LimitNOFILE=65536
+LimitNPROC=4096
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/openclaw/data /tmp/devclaw
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+
+[Install]
+WantedBy=multi-user.target

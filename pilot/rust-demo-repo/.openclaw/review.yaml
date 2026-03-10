@@ -1,0 +1,20 @@
+repo:
+  language: rust
+  profile_default: STANDARD
+
+commands:
+  test:
+    - "cargo test"
+  lint:
+    - "cargo clippy -- -D warnings"
+    - "cargo fmt --check"
+  
+security:
+  dependency_scan:
+    - "cargo audit"
+
+policy:
+  allow_warn_merge: false
+  fail_on_warn_over: 10
+  require_approval: true
+  max_review_time_minutes: 30

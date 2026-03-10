@@ -1,0 +1,128 @@
+# Mixed-Language Monorepo Review Configuration
+# Place this file at: .openclaw/review.yaml
+# 
+# This example shows a monorepo with Python (backend), Rust (core library),
+# and Node.js (frontend) components.
+
+repo:
+  language: mixed
+  profile_default: STANDARD
+
+commands:
+  # Test commands per language/component
+  test:
+    # Rust core tests
+    - "cd crates/core && cargo test --all-features"
+    # Python API tests
+    - "cd backend && pytest -q --tb=short"
+    # Node.js frontend tests
+    - "cd frontend && npm test -- --coverage"
+  
+  lint:
+    # Rust linting
+    - "cargo clippy --workspace --all-targets -- -D warnings"
+    # Python linting
+    - "cd backend && ruff check ."
+    # Node.js linting
+    - "cd frontend && npm run lint"
+  
+  typecheck:
+    # Rust (compile-time type checking)
+    - "cargo check --workspace"
+    # Python type checking
+    - "cd backend && mypy . --ignore-missing-imports"
+    # TypeScript type checking
+    - "cd frontend && npx tsc --noEmit"
+  
+  format:
+    # Rust formatting
+    - "cargo fmt --check"
+    # Python formatting
+    - "cd backend && black --check ."
+    # Node.js formatting
+    - "cd frontend && npx prettier --check ."
+  
+  build:
+    # Rust build
+    - "cargo build --release"
+    # Python package build
+    - "cd backend && python -m build"
+    # Frontend build
+    - "cd frontend && npm run build"
+
+security:
+  dependency_scan:
+    # Rust dependencies
+    - "cargo audit"
+    - "cargo deny check"
+    # Python dependencies
+    - "cd backend && pip-audit -r requirements.txt"
+    # Node.js dependencies
+    - "cd frontend && npm audit --audit-level moderate"
+  
+  secret_scan:
+    - "gitleaks detect --verbose"
+    - "detect-secrets scan"
+  
+  sast_scan:
+    # Rust SAST
+    - "cargo geiger"
+    # Python SAST
+    - "cd backend && bandit -r src"
+    # Node.js SAST
+    - "cd frontend && npx eslint-plugin-security"
+
+policy:
+  allow_warn_merge: false
+  fail_on_warn_over: 10
+  require_approval: true
+  max_review_time_minutes: 45
+
+# Per-component configuration
+components:
+  rust_core:
+    path: "crates/core"
+    language: rust
+    profile: STRICT
+    commands:
+      test:
+        - "cargo test --all-features"
+      security:
+        - "cargo audit"
+  
+  backend_api:
+    path: "backend"
+    language: python
+    profile: STANDARD
+    commands:
+      test:
+        - "pytest -q --tb=short --cov=src --cov-report=term-missing"
+      typecheck:
+        - "mypy . --strict"
+  
+  frontend_app:
+    path: "frontend"
+    language: node
+    profile: LENIENT
+    commands:
+      test:
+        - "npm test -- --watchAll=false"
+      typecheck:
+        - "npx tsc --noEmit"
+
+# Global ignore patterns
+ignore:
+  patterns:
+    - "**/node_modules/**"
+    - "**/target/**"
+    - "**/__pycache__/**"
+    - "**/.git/**"
+    - "**/dist/**"
+    - "**/build/**"
+    - "**/*.min.js"
+    - "**/vendor/**"
+  
+  paths:
+    - "frontend/coverage"
+    - "backend/htmlcov"
+    - "docs/_build"
